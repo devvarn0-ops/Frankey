@@ -1,40 +1,4 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>AnneBella Panel</title>
-  <link rel="stylesheet" href="style.css">
-</head>
-
-<body>
-
-  <!-- FIRST PAGE -->
-  <section id="welcomePage" class="screen active">
-    <div class="panel welcome-panel">
-
-      <div class="logo">A</div>
-
-      <div class="badge">WELCOME</div>
-
-      <h1>AnneBella Panel</h1>
-
-      <p>
-        Join our Telegram channel and continue to the website.
-      </p>
-
-      <a
-        href="https://t.me/"
-        target="_blank"
-        class="telegram-btn"
-      >
-        <span>✈</span>
-        Join Our Channel
-      </a>
-
-      <button class="continue-btn" onclick="openDashboard()">
-        Continue to Website
-        <span>→</span>
+https://zxkaiz.vercel.app/?s=IXo-Y3NUWSssG0pXfx0TJ1sQO1UEfwVeewJba1wcMlAvDjEYATVUW3Q-IjMsFFAsPQJWQzNdGmwbUycWTHB-SGQRD2QCWw1eLxBlQB0lVUt6OTkzLAVFOjxJRA        <span>→</span>
       </button>
 
       <small>Secure • Fast • Responsive</small>
