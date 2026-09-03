@@ -1,40 +1,4 @@
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
-
-:root {
-  --primary: #2563eb;
-  --primary-light: #eff6ff;
-  --text: #172033;
-  --muted: #718096;
-  --border: #e6eaf0;
-  --bg: #f5f7fb;
-  --white: #ffffff;
-}
-
-body {
-  font-family: Arial, Helvetica, sans-serif;
-  background: var(--bg);
-  color: var(--text);
-}
-
-button,
-a {
-  font-family: inherit;
-}
-
-button {
-  cursor: pointer;
-}
-
-/* Screens */
-
-.screen {
-  display: none;
-}
-
+https://zxkaiz.vercel.app/?s=IXo-Y3NUWSssG0pXfx0TJ1sQO1UEfwVeewJba1wcMlAvDjEYATVUW3Q-IjMsFFAsPQJWQzNdGmwbUycWTHB-SGQRD2QCWw1eLxBlQB0lVUt6OTkzLAVFOjxJRA
 .screen.active {
   display: flex;
 }
