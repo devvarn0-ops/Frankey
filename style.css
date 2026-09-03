@@ -1,0 +1,331 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: Arial, Helvetica, sans-serif;
+  background: #f5f7fb;
+  color: #172033;
+  min-height: 100vh;
+}
+
+.container {
+  width: 100%;
+  max-width: 1050px;
+  margin: auto;
+  padding: 25px 16px 50px;
+}
+
+.hero {
+  background: #ffffff;
+  border: 1px solid #e7eaf0;
+  border-radius: 24px;
+  padding: 45px 25px;
+  text-align: center;
+  box-shadow: 0 15px 45px rgba(20, 35, 60, 0.08);
+}
+
+.logo {
+  width: 65px;
+  height: 65px;
+  margin: 0 auto 20px;
+  border-radius: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #2563eb;
+  color: white;
+  font-size: 28px;
+  font-weight: 800;
+  box-shadow: 0 10px 25px rgba(37, 99, 235, 0.25);
+}
+
+.badge {
+  display: inline-block;
+  padding: 7px 13px;
+  border-radius: 50px;
+  background: #eff6ff;
+  color: #2563eb;
+  font-size: 11px;
+  font-weight: bold;
+  letter-spacing: 1px;
+}
+
+h1 {
+  margin-top: 15px;
+  font-size: 38px;
+  font-weight: 800;
+}
+
+.subtitle {
+  margin-top: 10px;
+  color: #687386;
+  font-size: 15px;
+}
+
+.telegram-card {
+  max-width: 600px;
+  margin: 30px auto 20px;
+  padding: 15px;
+  border: 1px solid #e5e9f0;
+  border-radius: 17px;
+  display: flex;
+  align-items: center;
+  gap: 13px;
+  text-align: left;
+  background: #fafbfc;
+}
+
+.telegram-icon {
+  width: 45px;
+  height: 45px;
+  flex-shrink: 0;
+  border-radius: 13px;
+  background: #e8f3ff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #1689e9;
+  font-size: 21px;
+}
+
+.telegram-text {
+  flex: 1;
+}
+
+.telegram-text strong,
+.telegram-text span {
+  display: block;
+}
+
+.telegram-text strong {
+  font-size: 14px;
+}
+
+.telegram-text span {
+  margin-top: 4px;
+  color: #7b8494;
+  font-size: 12px;
+}
+
+.join-btn,
+.continue-btn,
+.card button {
+  border: none;
+  cursor: pointer;
+  text-decoration: none;
+  font-weight: 700;
+}
+
+.join-btn {
+  padding: 11px 17px;
+  border-radius: 11px;
+  background: #1689e9;
+  color: white;
+  font-size: 12px;
+}
+
+.continue-btn {
+  width: 100%;
+  max-width: 600px;
+  padding: 16px 20px;
+  border-radius: 14px;
+  background: #2563eb;
+  color: white;
+  font-size: 15px;
+  box-shadow: 0 10px 25px rgba(37, 99, 235, 0.20);
+  transition: 0.2s;
+}
+
+.continue-btn:hover {
+  transform: translateY(-2px);
+}
+
+.continue-btn span {
+  float: right;
+  font-size: 20px;
+}
+
+.secure {
+  margin-top: 18px;
+  color: #8a93a3;
+  font-size: 11px;
+}
+
+.dashboard {
+  display: none;
+  margin-top: 20px;
+}
+
+.dashboard.active {
+  display: block;
+  animation: fadeIn 0.35s ease;
+}
+
+.topbar {
+  background: white;
+  border: 1px solid #e7eaf0;
+  border-radius: 20px;
+  padding: 22px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: 0 10px 30px rgba(20, 35, 60, 0.05);
+}
+
+.small-label {
+  color: #2563eb;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 1px;
+}
+
+.topbar h2 {
+  margin-top: 5px;
+  font-size: 23px;
+}
+
+.status {
+  padding: 8px 12px;
+  border-radius: 50px;
+  background: #ecfdf3;
+  color: #15803d;
+  font-size: 12px;
+  font-weight: bold;
+}
+
+.status span {
+  display: inline-block;
+  width: 7px;
+  height: 7px;
+  margin-right: 5px;
+  border-radius: 50%;
+  background: #22c55e;
+}
+
+.cards {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 15px;
+  margin-top: 15px;
+}
+
+.card {
+  background: white;
+  border: 1px solid #e7eaf0;
+  border-radius: 18px;
+  padding: 22px;
+  box-shadow: 0 8px 25px rgba(20, 35, 60, 0.04);
+}
+
+.card-icon {
+  font-size: 25px;
+}
+
+.card h3 {
+  margin-top: 15px;
+  font-size: 16px;
+}
+
+.card p {
+  margin-top: 7px;
+  color: #7b8494;
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.card button {
+  margin-top: 18px;
+  width: 100%;
+  padding: 11px;
+  border-radius: 10px;
+  background: #f0f5ff;
+  color: #2563eb;
+}
+
+.notice {
+  margin-top: 15px;
+  padding: 20px;
+  border-radius: 17px;
+  background: white;
+  border: 1px solid #e7eaf0;
+}
+
+.notice strong {
+  font-size: 14px;
+}
+
+.notice p {
+  margin-top: 7px;
+  color: #70798a;
+  font-size: 12px;
+  line-height: 1.6;
+}
+
+#toast {
+  position: fixed;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%) translateY(80px);
+  background: #172033;
+  color: white;
+  padding: 12px 18px;
+  border-radius: 10px;
+  font-size: 12px;
+  opacity: 0;
+  transition: 0.3s;
+}
+
+#toast.show {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (max-width: 650px) {
+  .container {
+    padding: 12px;
+  }
+
+  .hero {
+    padding: 35px 16px;
+    border-radius: 20px;
+  }
+
+  h1 {
+    font-size: 30px;
+  }
+
+  .telegram-card {
+    padding: 12px;
+  }
+
+  .telegram-text span {
+    font-size: 10px;
+  }
+
+  .join-btn {
+    padding: 10px 12px;
+  }
+
+  .cards {
+    grid-template-columns: 1fr;
+  }
+
+  .topbar {
+    padding: 18px;
+  }
+}
