@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>My Panel</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+  <main class="container">
+
+    <section class="hero">
+      <div class="logo">X</div>
+
+      <span class="badge">WELCOME</span>
+
+      <h1>My Panel</h1>
+
+      <p class="subtitle">
+        Welcome to your personal control panel
+      </p>
+
+      <div class="telegram-card">
+        <div class="telegram-icon">✈</div>
+
+        <div class="telegram-text">
+          <strong>Join our Telegram</strong>
+          <span>Get updates and announcements</span>
+        </div>
+
+        <a
+          href="https://t.me/"
+          target="_blank"
+          class="join-btn"
+        >
+          Join
+        </a>
+      </div>
+
+      <button class="continue-btn" onclick="continueToPanel()">
+        Continue
+        <span>→</span>
+      </button>
+
+      <p class="secure">
+        🔒 Secure &nbsp; • &nbsp; Fast &nbsp; • &nbsp; Responsive
+      </p>
+    </section>
+
+    <section id="dashboard" class="dashboard">
+
+      <div class="topbar">
+        <div>
+          <span class="small-label">DASHBOARD</span>
+          <h2>Control Panel</h2>
+        </div>
+
+        <div class="status">
+          <span></span> Online
+        </div>
+      </div>
+
+      <div class="cards">
+
+        <div class="card">
+          <div class="card-icon">⚡</div>
+          <h3>Quick Access</h3>
+          <p>Access your panel tools quickly.</p>
+          <button onclick="showMessage('Quick Access selected')">
+            Open
+          </button>
+        </div>
+
+        <div class="card">
+          <div class="card-icon">📊</div>
+          <h3>Statistics</h3>
+          <p>View your panel information.</p>
+          <button onclick="showMessage('Statistics selected')">
+            View
+          </button>
+        </div>
+
+        <div class="card">
+          <div class="card-icon">⚙️</div>
+          <h3>Settings</h3>
+          <p>Manage your panel settings.</p>
+          <button onclick="showMessage('Settings selected')">
+            Settings
+          </button>
+        </div>
+
+      </div>
+
+      <div class="notice">
+        <strong>Information</strong>
+        <p>
+          This is your personal dashboard. Customize the buttons,
+          text and features according to your own project.
+        </p>
+      </div>
+
+    </section>
+
+  </main>
+
+  <div id="toast"></div>
+
+  <script src="script.js"></script>
+</body>
+</html>
