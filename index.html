@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#09090b">
+  <title>ZXKAI — Admin Console</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="app">
+    <header class="topbar">
+      <div class="brand-mini"><span class="brand-z">Z</span><span>XKAI</span><small>XSONU</small></div>
+      <div class="top-actions">
+        <button class="icon-btn" aria-label="Search">⌕</button>
+        <span class="status-pill"><i></i> Connected</span>
+        <button class="telegram" aria-label="Telegram">➤</button>
+        <span class="time-pill">◷ <span id="clock">19:51</span></span>
+        <button class="logout">⇥ Logout</button>
+      </div>
+    </header>
+
+    <main id="app-view"></main>
+  </div>
+
+  <div id="toast" class="toast"></div>
+  <script src="app.js"></script>
+</body>
+</html>
