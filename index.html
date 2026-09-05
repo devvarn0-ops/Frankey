@@ -3,38 +3,201 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Profex Panel</title>
+    <title>Frankey Panel</title>
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body class="bg-gray-900 text-white font-sans antialiased flex flex-col items-center justify-center min-h-screen p-4">
 
-    <!-- Main Container -->
-    <div class="w-full max-w-md bg-gray-800 rounded-xl shadow-2xl overflow-hidden border border-gray-700 pb-4">
+    <div class="w-full max-w-md bg-gray-800 rounded-xl shadow-2xl overflow-hidden border border-gray-700 pb-4 relative min-h-[500px]">
         
         <!-- Header -->
-        <div class="bg-gray-950 p-6 text-center border-b border-gray-700 shadow-sm">
-            <h1 class="text-3xl font-bold tracking-widest text-blue-500 uppercase drop-shadow-md">Profex</h1>
-            <p class="text-gray-400 text-sm mt-1">Device Management Console</p>
+        <div class="bg-gray-950 p-5 text-center border-b border-gray-700 shadow-sm relative">
+            <button id="btn-back" class="hidden absolute left-4 top-5 bg-gray-700 hover:bg-gray-600 px-3 py-1 rounded text-sm text-gray-300 font-bold transition">← Back</button>
+            <h1 class="text-2xl font-bold tracking-widest text-blue-500 uppercase drop-shadow-md">Profex Console</h1>
+            <p id="header-status" class="text-gray-400 text-xs mt-1">Status: Disconnected</p>
         </div>
 
-        <div class="p-5 space-y-5">
+        <div class="p-5">
             
-            <!-- Connect New Database Box -->
-            <div class="bg-gray-900 p-4 rounded-lg border border-gray-700">
-                <h3 class="text-sm font-semibold text-gray-200 mb-2 flex justify-between">
-                    Connect New Database 
-                    <span class="text-xs text-gray-500 font-normal">(JSON Format)</span>
-                </h3>
-                <textarea id="firebase-config-input" rows="5" class="w-full bg-gray-950 text-xs text-green-400 p-3 rounded border border-gray-600 focus:outline-none focus:border-blue-500 placeholder-gray-600 font-mono" placeholder='{
-  "apiKey": "...",
-  "databaseURL": "...",
-  "projectId": "..."
-}'></textarea>
-                <button id="connect-db-btn" class="w-full mt-3 bg-blue-600 hover:bg-blue-500 text-white font-semibold py-2 px-4 rounded transition duration-200 shadow">
-                    Connect Live Data
-                </button>
+            <!-- SCREEN 1: CONNECTION PAGE -->
+            <div id="screen-connect" class="space-y-4">
+                <div class="bg-gray-900 p-4 rounded-lg border border-gray-700">
+                    <h3 class="text-sm font-semibold text-gray-200 mb-2">Connect Firebase Database</h3>
+                    <textarea id="firebase-config-input" rows="4" class="w-full bg-gray-950 text-xs text-green-400 p-3 rounded border border-gray-600 focus:outline-none focus:border-blue-500 placeholder-gray-600 font-mono" placeholder="Paste Direct Link (https://...) OR JSON Config here..."></textarea>
+                    <button id="connect-db-btn" class="w-full mt-3 bg-blue-600 hover:bg-blue-500 text-white font-semibold py-2 px-4 rounded transition duration-200 shadow">
+                        Connect Database
+                    </button>
+                </div>
             </div>
 
+            <!-- SCREEN 2: DEVICE (NUMBERS) LIST PAGE -->
+            <div id="screen-list" class="hidden space-y-3">
+                <div class="flex justify-between items-center border-b border-gray-700 pb-2 mb-2">
+                    <h2 class="text-lg font-semibold text-gray-200">Active Devices</h2>
+                    <span id="account-count" class="bg-green-600 text-white text-xs px-2 py-0.5 rounded-full shadow">0</span>
+                </div>
+                <!-- Dynamic Numbers will appear here -->
+                <div id="device-list-container" class="flex flex-col gap-2 max-h-[350px] overflow-y-auto pr-1">
+                    <div class="text-center text-gray-500 text-sm py-4">Waiting for devices...</div>
+                </div>
+            </div>
+
+            <!-- SCREEN 3: LIVE SMS/DATA PAGE -->
+            <div id="screen-details" class="hidden space-y-3">
+                <div class="flex flex-col border-b border-gray-700 pb-2 mb-2">
+                    <span class="text-xs text-gray-400">Monitoring Target:</span>
+                    <h2 id="target-id-display" class="text-lg font-bold text-blue-400">...</h2>
+                </div>
+                <!-- Live Data will appear here -->
+                <div id="live-data-container" class="bg-gray-950 p-3 rounded-lg border border-gray-700 min-h-[250px] max-h-[350px] overflow-y-auto text-sm text-gray-300 font-mono flex flex-col gap-3">
+                    Loading live stream...
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- Firebase Logic -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
+        import { getDatabase, ref, onValue, off } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-database.js";
+
+        // UI Elements
+        const screenConnect = document.getElementById('screen-connect');
+        const screenList = document.getElementById('screen-list');
+        const screenDetails = document.getElementById('screen-details');
+        const btnBack = document.getElementById('btn-back');
+        const headerStatus = document.getElementById('header-status');
+        
+        let globalDb = null;
+        let activeDeviceListener = null; // Store listener to cancel it on back
+
+        // Helper: Switch Screens
+        function showScreen(screenName) {
+            screenConnect.classList.add('hidden');
+            screenList.classList.add('hidden');
+            screenDetails.classList.add('hidden');
+            btnBack.classList.add('hidden');
+
+            if(screenName === 'connect') screenConnect.classList.remove('hidden');
+            if(screenName === 'list') {
+                screenList.classList.remove('hidden');
+                headerStatus.innerText = "Status: Connected (Live)";
+                headerStatus.className = "text-green-400 text-xs mt-1 font-bold";
+            }
+            if(screenName === 'details') {
+                screenDetails.classList.remove('hidden');
+                btnBack.classList.remove('hidden');
+            }
+        }
+
+        // STEP 1: Connect Database
+        document.getElementById('connect-db-btn').addEventListener('click', () => {
+            const configInput = document.getElementById('firebase-config-input').value.trim();
+            if(!configInput) return alert("Please enter Firebase details.");
+            
+            let dynamicConfig;
+            try {
+                if (configInput.startsWith("http")) {
+                    dynamicConfig = { databaseURL: configInput };
+                } else {
+                    dynamicConfig = JSON.parse(configInput);
+                }
+                
+                const dynamicApp = initializeApp(dynamicConfig, "ProfexApp_" + Date.now());
+                globalDb = getDatabase(dynamicApp);
+
+                startListeningToDevices();
+                showScreen('list');
+
+            } catch (error) {
+                alert("Invalid Configuration. Make sure link is correct.");
+            }
+        });
+
+        // STEP 2: Listen to all devices (Numbers List)
+        function startListeningToDevices() {
+            const listContainer = document.getElementById('device-list-container');
+            const dataRef = ref(globalDb, 'devices'); // Main folder in database
+
+            onValue(dataRef, (snapshot) => {
+                const data = snapshot.val();
+                listContainer.innerHTML = ''; 
+                
+                if (data) {
+                    const keys = Object.keys(data);
+                    document.getElementById('account-count').innerText = keys.length;
+                    
+                    keys.forEach(deviceId => {
+                        const btn = document.createElement('button');
+                        btn.className = "w-full text-left bg-gray-800 hover:bg-gray-700 p-3 rounded-lg border border-l-4 border-l-green-500 border-gray-600 transition flex justify-between items-center";
+                        btn.innerHTML = `
+                            <span class="font-bold text-gray-200">${deviceId}</span>
+                            <span class="text-xs bg-gray-900 px-2 py-1 rounded text-blue-400">View Data →</span>
+                        `;
+                        
+                        // Click to open detailed page
+                        btn.onclick = () => openDeviceDetails(deviceId);
+                        listContainer.appendChild(btn);
+                    });
+                } else {
+                    document.getElementById('account-count').innerText = "0";
+                    listContainer.innerHTML = '<div class="text-center text-gray-500 text-sm py-4">No active devices found in database.</div>';
+                }
+            });
+        }
+
+        // STEP 3: Open specific device page (Live SMS/Data)
+        function openDeviceDetails(deviceId) {
+            showScreen('details');
+            document.getElementById('target-id-display').innerText = deviceId;
+            const dataContainer = document.getElementById('live-data-container');
+            dataContainer.innerHTML = '<div class="text-blue-400 animate-pulse">Fetching live data...</div>';
+
+            const deviceRef = ref(globalDb, `devices/${deviceId}`);
+
+            // Listen to this specific device
+            activeDeviceListener = onValue(deviceRef, (snapshot) => {
+                const deviceData = snapshot.val();
+                dataContainer.innerHTML = ''; // Clear loading
+
+                if(deviceData) {
+                    // Loop through all data fields (sms, location, device info etc)
+                    if(typeof deviceData === 'object') {
+                        Object.keys(deviceData).forEach(key => {
+                            const val = deviceData[key];
+                            const displayVal = typeof val === 'object' ? JSON.stringify(val, null, 2) : val;
+                            
+                            const msgBox = document.createElement('div');
+                            msgBox.className = "bg-gray-900 p-2 rounded border border-gray-700 shadow-inner";
+                            msgBox.innerHTML = `
+                                <div class="text-xs text-blue-400 font-bold mb-1 uppercase">${key}</div>
+                                <div class="text-gray-300 whitespace-pre-wrap">${displayVal}</div>
+                            `;
+                            dataContainer.appendChild(msgBox);
+                        });
+                    } else {
+                        dataContainer.innerText = deviceData; // If it's just plain text
+                    }
+                } else {
+                    dataContainer.innerHTML = '<div class="text-red-400">Data completely removed or unavailable.</div>';
+                }
+            });
+        }
+
+        // Back Button Logic
+        btnBack.addEventListener('click', () => {
+            // Stop listening to the specific device when going back
+            if(activeDeviceListener && globalDb) {
+                const targetId = document.getElementById('target-id-display').innerText;
+                off(ref(globalDb, `devices/${targetId}`));
+            }
+            showScreen('list');
+        });
+
+    </script>
+</body>
+</html>
             <!-- Saved Accounts Box -->
             <div class="bg-gray-900 p-4 rounded-lg border border-gray-700 min-h-[150px]">
                 <div class="flex justify-between items-center border-b border-gray-700 pb-3 mb-3">
