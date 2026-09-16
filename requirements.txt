@@ -1,1 +1,0 @@
-# No third-party Python package is required by the API runtime.
