@@ -1,0 +1,524 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Aadhaar to PAN Finder | Instant Portal</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800&family=JetBrains+Mono:wght@700;800&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+<style>
+:root{--primary-color:#0b2545;--accent-cyan:#00b4d8;--border-color:#e2e8f0;--tg:#229ED9}
+*{box-sizing:border-box}
+body{font-family:'Plus Jakarta Sans',system-ui,-apple-system,sans-serif;background:#f8fafc;color:#1e293b;margin:0;min-height:100vh}
+.app-header{background:#fff;border-bottom:1px solid var(--border-color);padding:12px 16px;box-shadow:0 1px 3px rgba(0,0,0,.05)}
+.brand-title{font-size:1.25rem;font-weight:800;color:var(--primary-color);letter-spacing:-.5px}
+.brand-dot{color:var(--accent-cyan)}
+.main-card{background:#fff;border:1px solid var(--border-color);border-radius:20px;padding:24px 20px;box-shadow:0 4px 20px rgba(0,0,0,.04);max-width:520px;margin:0 auto 30px}
+@media(min-width:576px){.main-card{padding:32px 28px}}
+.aadhaar-box{position:relative;width:100%}
+.aadhaar-box .input-icon{position:absolute;left:16px;top:50%;transform:translateY(-50%);font-size:1.25rem;color:#94a3b8;pointer-events:none}
+.aadhaar-input{width:100%;height:56px;padding:12px 16px 12px 48px;font-size:1.35rem;font-weight:700;font-family:'JetBrains Mono',monospace;letter-spacing:2px;background:#f8fafc;border:2px solid #cbd5e1;border-radius:14px}
+.aadhaar-input:focus{background:#fff;border-color:var(--accent-cyan);box-shadow:0 0 0 4px rgba(0,180,216,.15);outline:none}
+.btn-primary-action{width:100%;height:54px;background:linear-gradient(135deg,#0b2545,#134074);color:#fff;border:none;border-radius:14px;font-size:1.05rem;font-weight:700;display:flex;align-items:center;justify-content:center;gap:8px;cursor:pointer}
+.btn-primary-action:hover{background:linear-gradient(135deg,#134074,#0b2545);color:#fff}
+.btn-primary-action:disabled{opacity:.7}
+.btn-unlock-action{width:100%;height:56px;background:linear-gradient(135deg,#10b981,#059669);color:#fff;border:none;border-radius:14px;font-size:1.05rem;font-weight:800;display:flex;align-items:center;justify-content:center;gap:8px;cursor:pointer;box-shadow:0 6px 20px rgba(16,185,129,.3);animation:glow 2s infinite}
+.btn-unlock-action:hover{color:#fff}
+.btn-unlock-action:disabled{animation:none;opacity:.75}
+@keyframes glow{0%{box-shadow:0 0 0 0 rgba(16,185,129,.6)}70%{box-shadow:0 0 0 10px rgba(16,185,129,0)}100%{box-shadow:0 0 0 0 rgba(16,185,129,0)}}
+.btn-tg{width:100%;height:52px;background:linear-gradient(135deg,#229ED9,#0077a8);color:#fff!important;border:none;border-radius:14px;font-size:1rem;font-weight:800;display:flex;align-items:center;justify-content:center;gap:9px;text-decoration:none;box-shadow:0 6px 18px rgba(34,158,217,.35)}
+.btn-tg:hover{transform:translateY(-1px);box-shadow:0 8px 24px rgba(34,158,217,.45);color:#fff!important}
+.masked-result-box{background:#f0fdf4;border:1.5px solid #86efac;border-radius:16px;padding:20px;text-align:center}
+.masked-pan-pill{font-family:'JetBrains Mono',monospace;font-size:1.6rem;font-weight:800;letter-spacing:3px;background:#fff;border:2px dashed #10b981;color:#065f46;padding:8px 20px;border-radius:12px;display:inline-block;margin:12px 0}
+.unlocked-final-box{background:linear-gradient(135deg,#f0fdf4,#dcfce7);border:2px solid #34d399;border-radius:20px;padding:24px 20px;text-align:center}
+.final-pan-display{font-family:'JetBrains Mono',monospace;font-size:1.9rem;font-weight:800;letter-spacing:3px;color:#0b2545;background:#fff;border:2px solid #10b981;border-radius:14px;padding:14px;margin:14px 0;box-shadow:0 4px 15px rgba(16,185,129,.15)}
+.font-mono{font-family:'JetBrains Mono',monospace}
+.app-footer{background:#fff;border-top:1px solid var(--border-color);margin-top:40px;padding:30px 16px}
+.tg-support-pill{display:inline-flex;align-items:center;gap:8px;background:linear-gradient(135deg,#0088cc,#00a8e8);color:#fff!important;text-decoration:none;padding:9px 20px;border-radius:50px;font-size:.88rem;font-weight:700}
+.dev-branding{font-size:.95rem;font-weight:600;color:#475569;display:flex;align-items:center;justify-content:center;flex-wrap:wrap;gap:6px}
+.dev-name-glow{font-weight:800;background:linear-gradient(90deg,#ff007f,#7928ca,#0070f3,#00dfd8,#ff007f);background-size:300% 300%;-webkit-background-clip:text;-webkit-text-fill-color:transparent;animation:gf 4s infinite}
+.state-bihar-glow{font-weight:800;background:linear-gradient(90deg,#ff7a00,#ff0055,#ffb703,#ff7a00);background-size:300% 300%;-webkit-background-clip:text;-webkit-text-fill-color:transparent;animation:gf 3.5s infinite reverse}
+@keyframes gf{0%{background-position:0% 50%}50%{background-position:100% 50%}100%{background-position:0% 50%}}
+.heart-beat{display:inline-block;animation:ph 1.4s infinite}
+@keyframes ph{0%,100%{transform:scale(1)}50%{transform:scale(1.25)}}
+.copyright-text{font-size:.78rem;color:#94a3b8}
+.debug-bar{font-family:'JetBrains Mono',monospace;font-size:.66rem;color:#94a3b8;text-align:center;margin-top:10px;word-break:break-all;min-height:14px}
+.setup{background:#f1f5f9;border:1px solid #cbd5e1;border-radius:14px;padding:12px;margin-bottom:14px;font-size:.78rem}
+.setup input{width:100%;font-family:'JetBrains Mono',monospace;font-size:.75rem;padding:8px;border:1px solid #cbd5e1;border-radius:8px;margin:6px 0}
+.pill{display:inline-block;font-size:.68rem;font-weight:800;padding:2px 9px;border-radius:20px}
+.pill.ok{background:#dcfce7;color:#15803d}
+.pill.bad{background:#fee2e2;color:#b91c1c}
+.pill.wait{background:#fef3c7;color:#b45309}
+.diag{font-family:'JetBrains Mono',monospace;font-size:.66rem;max-height:180px;overflow:auto;background:#0f172a;color:#cbd5e1;border-radius:10px;padding:8px;margin-top:8px;display:none;white-space:pre-wrap}
+.tg-strip{display:flex;align-items:center;gap:8px;background:#e7f5fd;border:1px solid #b6e3f7;color:#0b6a92;border-radius:12px;padding:9px 12px;font-size:.78rem;font-weight:700;margin-top:12px}
+@media print{.app-header,.app-footer,.noprint,.setup,.debug-bar{display:none!important}body{background:#fff}.main-card{border:0;box-shadow:none;margin:0;max-width:100%}}
+</style>
+</head>
+<body>
+
+<header class="app-header">
+  <div class="container d-flex justify-content-center justify-content-sm-between align-items-center">
+    <a href="#" class="text-decoration-none d-flex align-items-center gap-2">
+      <i class="bi bi-credit-card-2-front-fill fs-4 text-primary"></i>
+      <span class="brand-title">PAN<span class="brand-dot">Finder</span></span>
+    </a>
+    <div class="d-none d-sm-block text-muted small fw-semibold"><i class="bi bi-shield-check text-success me-1"></i> 100% Free</div>
+  </div>
+</header>
+
+<div class="container my-3 my-md-4">
+  <div class="main-card">
+
+    <div class="setup noprint">
+      <div class="d-flex justify-content-between align-items-center">
+        <b><i class="bi bi-hdd-network"></i> Connection</b>
+        <span id="connPill" class="pill wait">idle</span>
+      </div>
+      <div class="text-muted mt-1 mb-1">Worker URL — sabse bharosemand. Khaali chhodo to direct/proxies try honge.</div>
+      <input id="workerInput" placeholder="https://your-worker.workers.dev">
+      <div class="d-flex gap-2">
+        <button type="button" id="workerSave" class="btn btn-primary btn-sm flex-fill fw-bold">Save &amp; Test</button>
+        <button type="button" id="workerClear" class="btn btn-outline-secondary btn-sm">Clear</button>
+        <button type="button" id="diagBtn" class="btn btn-dark btn-sm fw-bold">Diagnose</button>
+      </div>
+      <div id="diagOut" class="diag"></div>
+    </div>
+
+    <div class="text-center mb-3">
+      <h4 class="fw-bold mb-1">Find Your Linked PAN Card</h4>
+      <p class="text-muted small mb-0">Enter your 12-digit Aadhaar number to check your linked PAN details.</p>
+    </div>
+
+    <div id="sigBox" class="setup noprint" style="display:none;background:#fffbeb;border-color:#fde68a;">
+      <b><i class="bi bi-key-fill"></i> Manual Security Key</b>
+      <div class="text-muted mb-1">Site kholo → <b>Ctrl+U</b> → "app-token" search → 3 values paste karo.</div>
+      <input id="manToken" placeholder="app-token (32 hex)">
+      <input id="manTime" placeholder="app-time (10 digit)">
+      <input id="manSig" placeholder="app-signature (64 hex)">
+      <button type="button" id="manSave" class="btn btn-warning btn-sm w-100 fw-bold">Save Key</button>
+    </div>
+
+    <div id="searchAlert" class="alert alert-danger py-2 small mb-3" style="display:none;"></div>
+
+    <form id="searchForm" autocomplete="off">
+      <div class="d-flex flex-column gap-2">
+        <div class="aadhaar-box">
+          <i class="bi bi-credit-card input-icon"></i>
+          <input type="text" id="aadhaarInput" class="aadhaar-input" placeholder="0000 0000 0000" maxlength="14" inputmode="numeric" required>
+        </div>
+        <button type="submit" id="searchBtn" class="btn-primary-action">
+          <span id="searchBtnSpinner" class="spinner-border spinner-border-sm" style="display:none;"></span>
+          <span id="searchBtnText"><i class="bi bi-search me-1"></i> Find Masked PAN (Free)</span>
+        </button>
+      </div>
+    </form>
+
+    <div class="d-flex justify-content-center flex-wrap gap-3 text-muted small mt-3" style="font-size:.8rem;">
+      <span><i class="bi bi-check-circle-fill text-success me-1"></i> Free Check</span>
+      <span><i class="bi bi-download me-1 text-primary"></i> Free Download</span>
+    </div>
+
+    <div id="maskedResultContainer" class="mt-4" style="display:none;">
+      <div class="masked-result-box">
+        <span class="badge bg-success-subtle text-success border border-success-subtle px-3 py-1 rounded-pill small fw-bold"><i class="bi bi-check2-circle me-1"></i> Linked Record Found!</span>
+        <div class="my-2"><div id="displayMaskedPan" class="masked-pan-pill">NH*P****1B</div></div>
+        <div class="text-muted small mb-3">Linked Aadhaar: <b id="displayAadhaar" class="font-mono text-dark">XXXX XXXX 1234</b></div>
+        <div class="pt-3 border-top border-success-subtle">
+          <h6 class="fw-bold text-dark mb-2">Original PAN Card — Bilkul Free</h6>
+          <a href="https://t.me/frankeypanel" target="_blank" rel="noopener" class="btn-tg mb-2">
+            <i class="bi bi-telegram fs-5"></i> Join Telegram @frankeypanel
+          </a>
+          <button id="unlockBtn" type="button" class="btn-unlock-action">
+            <i class="bi bi-unlock-fill me-1"></i> Unlock &amp; Download PAN
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div id="unlockedFinalContainer" class="mt-4" style="display:none;"></div>
+    <div id="debugBar" class="debug-bar noprint"></div>
+  </div>
+</div>
+
+<footer class="app-footer">
+  <div class="container text-center">
+    <div class="mb-3"><a href="https://t.me/frankeypanel" target="_blank" rel="noopener" class="tg-support-pill"><i class="bi bi-telegram fs-5"></i><span>Join Channel: <b>@frankeypanel</b></span></a></div>
+    <div class="dev-branding mb-2">
+      <span>Website Developed by <span class="dev-name-glow">FRANKEY</span></span><span class="mx-1 text-muted">•</span>
+      <span>Made with <i class="bi bi-heart-fill heart-beat text-danger"></i>  
+    </div>
+    <p class="copyright-text mb-0">© 2026 Aadhaar to PAN Instant Portal. All Rights Reserved.</p>
+  </div>
+</footer>
+
+<script>
+/* =====================================================================
+   v7 — koi payment nahi, Telegram join, free PAN + free download
+   ===================================================================== */
+const BASE = 'https://panfind.allprinthub.in';
+const TG = 'https://t.me/frankeypanel';
+const enc = encodeURIComponent;
+const WKEY = 'pf_worker_v5', SKEY = 'pf_sig_v5', RKEY = 'pf_res_v7';
+let WORKER = (localStorage.getItem(WKEY) || '').replace(/\/+$/, '');
+
+const PROXIES = [
+  { id:'allorigins',   post:true,  u:u => 'https://api.allorigins.win/raw?charset=UTF-8&url=' + enc(u) },
+  { id:'codetabs',     post:false, u:u => 'https://api.codetabs.com/v1/proxy/?quest=' + enc(u) },
+  { id:'corslol',      post:false, u:u => 'https://api.cors.lol/?url=' + enc(u) },
+  { id:'allorigins-j', post:false, u:u => 'https://api.allorigins.win/get?url=' + enc(u) },
+  { id:'corsproxy-io', post:true,  u:u => 'https://corsproxy.io/?url=' + enc(u) },
+  { id:'corsfix',      post:true,  u:u => 'https://proxy.corsfix.com/?' + u },
+  { id:'cors-eu',      post:true,  u:u => 'https://cors.eu.org/' + u },
+  { id:'corsworkers',  post:true,  u:u => 'https://test.cors.workers.dev/?' + u },
+  { id:'iso-git',      post:true,  u:u => 'https://cors.isomorphic-git.org/' + u },
+  { id:'thingproxy',   post:true,  u:u => 'https://thingproxy.freeboard.io/fetch/' + u },
+  { id:'yacdn',        post:false, u:u => 'https://yacdn.org/proxy/' + u },
+  { id:'urlreq',       post:false, u:u => 'https://urlreq.appspot.com/req?method=GET&url=' + enc(u) },
+  { id:'corssh',       post:true,  u:u => 'https://proxy.cors.sh/' + u }
+];
+
+const SEED = { token:'34c6be0ac92f1dd5117949f543a0e571', time:'1795157787',
+               sig:'444432e21dee49bde460ad8661be2e7641e51ab975bcb90c2a22f9f68afbb1c2', at:0 };
+
+const $ = id => document.getElementById(id);
+let SEC = (() => { try { return JSON.parse(localStorage.getItem(SKEY) || 'null'); } catch(e) { return null; } })();
+let RES = (() => { try { return JSON.parse(localStorage.getItem(RKEY) || '{}'); } catch(e) { return {}; } })();
+let curAadhaar = '', curMasked = '', curPan = '';
+
+const dbg = m => { const e = $('debugBar'); if (e) e.textContent = m; };
+const sleep = ms => new Promise(r => setTimeout(r, ms));
+const maskA = a => 'XXXX XXXX ' + String(a).slice(-4);
+const validPan = p => /^[A-Z]{5}[0-9]{4}[A-Z]$/.test(String(p || '').trim().toUpperCase());
+const pill = (c, t) => { const p = $('connPill'); if (p) { p.className = 'pill ' + c; p.textContent = t; } };
+
+const timeout = (p, ms) => Promise.race([p, new Promise((_, j) => setTimeout(() => j(new Error('timeout')), ms))]);
+async function readText(r) { let t = await r.text(); try { const o = JSON.parse(t); if (o && typeof o.contents === 'string') t = o.contents; } catch(e) {} return t; }
+function parseJson(t) { if (!t) return null; const i = t.indexOf('{'); if (i < 0) return null; try { return JSON.parse(t.slice(i)); } catch(e) { return null; } }
+
+/* ---------------- transport: direct -> worker -> proxies ---------------- */
+async function viaDirect(target, opts) {
+  try { const r = await timeout(fetch(target, opts || {}), 12000); const t = await readText(r); return t && t.length > 2 ? t : null; } catch(e) { return null; }
+}
+async function viaWorker(target, opts) {
+  if (!WORKER) return null;
+  try { const r = await timeout(fetch(WORKER + '?u=' + enc(target), opts || {}), 15000); const t = await readText(r); return t && t.length > 2 ? t : null; } catch(e) { dbg('worker: ' + e.message); return null; }
+}
+async function send(target, opts) {
+  let t = await viaDirect(target, opts);
+  if (t) { pill('ok', 'direct ok'); return t; }
+  t = await viaWorker(target, opts);
+  if (t) { pill('ok', 'worker ok'); return t; }
+  if (opts && opts.method === 'POST') {
+    for (const p of PROXIES.filter(x => x.post)) {
+      try { const r = await timeout(fetch(p.u(target), opts), 9000); const v = await readText(r); if (v && v.length > 2) { pill('wait', 'via ' + p.id); return v; } } catch(e) {}
+    }
+  } else {
+    const s = await Promise.allSettled(PROXIES.map(p => timeout(fetch(p.u(target), opts || {}).then(readText), 9000)));
+    for (const x of s) if (x.status === 'fulfilled' && x.value && x.value.length > 2) { pill('wait', 'via proxy'); return x.value; }
+  }
+  pill('bad', 'all failed');
+  return null;
+}
+
+/* ---------------- signature ---------------- */
+async function fetchSig() {
+  const txt = await send(BASE + '/index.php?_=' + Date.now());
+  if (!txt) return null;
+  let token = null, time = null, sig = null;
+  const blk = txt.match(/APP_SECURITY\s*=\s*\{([\s\S]{0,400}?)\}/i);
+  if (blk) {
+    const a = blk[1].match(/token\s*:\s*["']([a-f0-9]{20,})["']/i);
+    const b = blk[1].match(/time\s*:\s*["']?(\d{9,13})["']?/i);
+    const c = blk[1].match(/sig\s*:\s*["']([a-f0-9]{40,})["']/i);
+    if (a && b && c) { token = a[1]; time = b[1]; sig = c[1]; }
+  }
+  if (!token) {
+    const a = txt.match(/name=["']app-token["']\s+content=["']([a-f0-9]+)["']/i);
+    const b = txt.match(/name=["']app-time["']\s+content=["'](\d+)["']/i);
+    const c = txt.match(/name=["']app-signature["']\s+content=["']([a-f0-9]+)["']/i);
+    if (a && b && c) { token = a[1]; time = b[1]; sig = c[1]; }
+  }
+  if (!token) { dbg('html mila par key nahi'); return null; }
+  SEC = { token, time, sig, at: Date.now() };
+  try { localStorage.setItem(SKEY, JSON.stringify(SEC)); } catch(e) {}
+  $('sigBox').style.display = 'none';
+  dbg('key ok');
+  return SEC;
+}
+async function getSec(force) {
+  if (!force && SEC && Date.now() - (SEC.at || 0) < 80000) return SEC;
+  const f = await fetchSig();
+  if (f) return f;
+  if (SEC) return SEC;
+  return SEED;
+}
+const sigQs = s => '?app_token=' + enc(s.token) + '&app_time=' + enc(s.time) + '&app_signature=' + enc(s.sig);
+
+/* ---------------- api ---------------- */
+async function apiGet(path, params, tries) {
+  const extra = params ? '&' + new URLSearchParams(params).toString() : '';
+  tries = tries || 3;
+  for (let r = 0; r < tries; r++) {
+    for (let i = 0; i < 2; i++) {
+      const s = await getSec(i > 0);
+      const t = await send(BASE + '/api/' + path + sigQs(s) + extra);
+      const j = parseJson(t); if (!j) continue;
+      if (j.code === 'SIGNATURE_MISMATCH') { SEC = null; continue; }
+      return j;
+    }
+    if (r < tries - 1) await sleep(1200);
+  }
+  throw new Error('FAILED');
+}
+async function apiPost(path, body, tries) {
+  tries = tries || 3;
+  for (let r = 0; r < tries; r++) {
+    for (let i = 0; i < 2; i++) {
+      const s = await getSec(i > 0);
+      const url = BASE + '/api/' + path + sigQs(s);
+      for (const mode of ['json', 'form']) {
+        const opts = { method:'POST',
+          headers:{ 'Content-Type': mode === 'json' ? 'application/json' : 'application/x-www-form-urlencoded' },
+          body: mode === 'json' ? JSON.stringify(body) : new URLSearchParams(body).toString() };
+        const t = await send(url, opts);
+        const j = parseJson(t); if (!j) continue;
+        if (j.code === 'SIGNATURE_MISMATCH') { SEC = null; break; }
+        if (mode === 'json' && !j.status && /required|invalid/i.test(j.message || '')) break;
+        return j;
+      }
+    }
+    if (r < tries - 1) await sleep(1200);
+  }
+  throw new Error('FAILED');
+}
+
+/* ---------------- helpers ---------------- */
+function showAlert(el, t, m) { if (!el) return; el.className = 'alert alert-' + t + ' py-2 small mb-3'; el.innerHTML = m; el.style.display = 'block'; }
+const hideAlert = el => { if (el) el.style.display = 'none'; };
+
+function copyText(t) {
+  if (navigator.clipboard && navigator.clipboard.writeText) return navigator.clipboard.writeText(t);
+  return new Promise((res, rej) => {
+    const ta = document.createElement('textarea');
+    ta.value = t; ta.style.position = 'fixed'; ta.style.left = '-9999px';
+    document.body.appendChild(ta); ta.select();
+    try { document.execCommand('copy'); res(); } catch(e) { rej(e); }
+    ta.remove();
+  });
+}
+
+async function diagnose() {
+  const out = $('diagOut'); out.style.display = 'block'; out.textContent = 'testing...\n';
+  const target = BASE + '/index.php?_=' + Date.now();
+  const log = ['protocol: ' + location.protocol];
+  let t = await viaDirect(target);
+  log.push((t ? '✅' : '❌') + ' direct');
+  if (t) { out.textContent = log.join('\n'); return; }
+  if (WORKER) { t = await viaWorker(target); log.push((t ? '✅' : '❌') + ' worker'); }
+  else log.push('➖ worker (not set)');
+  const res = await Promise.allSettled(PROXIES.map(p => timeout(fetch(p.u(target)).then(readText).then(x => x && x.includes('app-token')), 9000)));
+  res.forEach((r, i) => log.push((r.status === 'fulfilled' && r.value ? '✅' : '❌') + ' ' + PROXIES[i].id));
+  log.push('\nworking: ' + log.filter(l => l.startsWith('✅')).length);
+  out.textContent = log.join('\n');
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  $('workerInput').value = WORKER;
+  $('aadhaarInput').addEventListener('input', e => {
+    const v = e.target.value.replace(/\D/g, '').slice(0, 12);
+    e.target.value = (v.match(/.{1,4}/g) || [v]).join(' ');
+  });
+  $('searchForm').addEventListener('submit', e => { e.preventDefault(); doSearch(); });
+  $('unlockBtn').addEventListener('click', doUnlock);
+  $('diagBtn').addEventListener('click', diagnose);
+  $('workerSave').addEventListener('click', async () => {
+    let v = $('workerInput').value.trim().replace(/\/+$/, '');
+    if (v && !/^https?:\/\//.test(v)) v = 'https://' + v;
+    WORKER = v; localStorage.setItem(WKEY, v);
+    pill('wait', 'testing...'); SEC = null;
+    const s = await fetchSig();
+    pill(s ? 'ok' : 'bad', s ? 'worker ok' : 'worker fail');
+  });
+  $('workerClear').addEventListener('click', () => {
+    WORKER = ''; localStorage.removeItem(WKEY); $('workerInput').value = '';
+    SEC = null; pill('wait', 'direct+proxies');
+  });
+  $('manSave').addEventListener('click', () => {
+    const t = $('manToken').value.trim(), tm = $('manTime').value.trim(), sg = $('manSig').value.trim();
+    if (!t || !tm || !sg) return;
+    SEC = { token:t, time:tm, sig:sg, at:Date.now() };
+    localStorage.setItem(SKEY, JSON.stringify(SEC));
+    $('sigBox').style.display = 'none'; hideAlert($('searchAlert')); dbg('manual key saved');
+  });
+  pill('wait', 'ready');
+  fetchSig();
+});
+
+/* ---------------- search ---------------- */
+async function doSearch() {
+  const a = $('aadhaarInput').value.replace(/\D/g, '');
+  const ab = $('searchAlert');
+  if (a.length !== 12) { showAlert(ab, 'danger', 'Valid 12-digit Aadhaar daalein.'); return; }
+
+  hideAlert(ab);
+  $('maskedResultContainer').style.display = 'none';
+  $('unlockedFinalContainer').style.display = 'none';
+  const b = $('searchBtn'); b.disabled = true;
+  $('searchBtnText').innerText = 'Searching...'; $('searchBtnSpinner').style.display = 'inline-block';
+  dbg('search ' + a);
+
+  try {
+    const d = await apiGet('find_masked.php', { aadhaar: a }, 4);
+    curAadhaar = a;
+    dbg('res: ' + (d.status || d.code || '?'));
+
+    if (d.already_unlocked === true && validPan(d.full_pan)) {
+      RES[a] = { pan: d.full_pan.trim().toUpperCase(), ref: d.order_id || 'RECORD', utr: d.utr || 'VERIFIED' };
+      localStorage.setItem(RKEY, JSON.stringify(RES));
+      showFinal(RES[a].pan, RES[a].ref, RES[a].utr); return;
+    }
+    if (d.masked_pan) { curMasked = d.masked_pan; renderMasked(d.masked_pan); return; }
+    if (d.status === 'not_found') { showAlert(ab, 'warning', d.message || 'Is Aadhaar par linked PAN nahi mila.'); return; }
+    showAlert(ab, 'warning', d.message || 'Koi record nahi mila.');
+  } catch(e) {
+    if (e.message === 'NO_SIG') {
+      $('sigBox').style.display = 'block';
+      showAlert(ab, 'danger', 'Security key nahi mili. <b>Diagnose</b> dabao aur worker URL set karo.');
+    } else {
+      showAlert(ab, 'danger', 'Connect nahi hua (' + e.message + '). <b>Diagnose</b> dabao.');
+    }
+    dbg('search err: ' + e.message);
+  } finally {
+    b.disabled = false; $('searchBtnText').innerText = 'Find Masked PAN (Free)'; $('searchBtnSpinner').style.display = 'none';
+  }
+}
+
+function renderMasked(pan) {
+  $('displayAadhaar').innerText = maskA(curAadhaar);
+  $('displayMaskedPan').innerText = pan;
+  const b = $('maskedResultContainer'); b.style.display = 'block';
+  b.scrollIntoView({ behavior:'smooth', block:'nearest' });
+}
+
+/* ---------------- free unlock + auto download ---------------- */
+async function doUnlock() {
+  if (!curAadhaar) { showAlert($('searchAlert'), 'warning', 'Pehle Aadhaar search karein.'); return; }
+
+  const b = $('unlockBtn'); b.disabled = true;
+  b.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span> PAN laa raha hai...';
+  hideAlert($('searchAlert'));
+  dbg('unlock start');
+
+  let orderId = null;
+
+  try {
+    const o = await apiPost('create_order.php', { aadhaar: curAadhaar, masked_pan: curMasked || '' });
+    dbg('order: ' + (o.status || o.code || '?'));
+
+    if (o.already_unlocked === true && validPan(o.full_pan)) {
+      RES[curAadhaar] = { pan: o.full_pan.trim().toUpperCase(), ref: o.order_id || 'RECORD', utr: o.utr || 'VERIFIED' };
+      localStorage.setItem(RKEY, JSON.stringify(RES));
+      showFinal(RES[curAadhaar].pan, RES[curAadhaar].ref, RES[curAadhaar].utr);
+      resetUnlock(); return;
+    }
+    orderId = o.order_id || null;
+  } catch(e) {
+    dbg('order err: ' + e.message);
+  }
+
+  if (orderId) {
+    for (let i = 0; i < 8; i++) {
+      dbg('fetch ' + (i + 1) + '/8');
+      try {
+        try { await apiGet('test_confirm.php', { order_id: orderId }, 1); } catch(e) {}
+        const f = await apiPost('execute_free_fetch.php', { order_id: orderId }, 1);
+        if (f.status === 'success' && validPan(f.full_pan)) {
+          const pan = f.full_pan.trim().toUpperCase();
+          RES[curAadhaar] = { pan, ref: orderId, utr: f.utr || 'FREE' };
+          localStorage.setItem(RKEY, JSON.stringify(RES));
+          showFinal(pan, orderId, f.utr || 'FREE');
+          resetUnlock(); return;
+        }
+        dbg('try ' + (i + 1) + ': ' + (f.message || f.status || 'no pan'));
+      } catch(e) { dbg('try ' + (i + 1) + ' err: ' + e.message); }
+      await sleep(2200);
+    }
+  }
+
+  showAlert($('searchAlert'), 'warning', 'PAN abhi nahi mila. Dobara <b>Unlock</b> dabao — server kabhi kabhi late deta hai.');
+  resetUnlock();
+}
+
+function resetUnlock() {
+  const b = $('unlockBtn'); b.disabled = false;
+  b.innerHTML = '<i class="bi bi-unlock-fill me-1"></i> Unlock &amp; Download PAN';
+}
+
+/* ---------------- download ---------------- */
+function downloadTxt(pan, ref, utr) {
+  const txt = 'PAN CARD DETAILS\n'
+    + '---------------------------\n'
+    + 'PAN Number : ' + pan + '\n'
+    + 'Aadhaar    : ' + maskA(curAadhaar) + '\n'
+    + 'Reference  : ' + ref + '\n'
+    + 'UTR / RRN  : ' + utr + '\n'
+    + 'Date       : ' + new Date().toLocaleString('en-IN') + '\n'
+    + '---------------------------\n'
+    + 'Aadhaar to PAN Finder\n'
+    + 'Telegram: @frankeypanel\n';
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(new Blob([txt], { type: 'text/plain' }));
+  a.download = 'PAN_' + pan + '.txt';
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(() => URL.revokeObjectURL(a.href), 5000);
+}
+
+/* ---------------- render final ---------------- */
+function cardHtml(pan, ref, utr) {
+  return '<div class="unlocked-final-box">'
+    + '<span class="badge bg-success text-white px-3 py-1 rounded-pill small fw-bold mb-2"><i class="bi bi-patch-check-fill me-1"></i> 100% FREE · VERIFIED</span>'
+    + '<h5 class="fw-bold text-dark mt-2 mb-1">Your PAN card number is:</h5>'
+    + '<div class="final-pan-display">' + pan + '</div>'
+    + '<div class="p-2 bg-white rounded-3 border text-start small mb-3"><div class="row g-1 font-mono" style="font-size:.78rem">'
+    + '<div class="col-6 text-muted">Aadhaar: <b class="text-dark">' + maskA(curAadhaar) + '</b></div>'
+    + '<div class="col-6 text-end text-muted">Ref: <b class="text-dark">' + ref + '</b></div>'
+    + '<div class="col-12 text-muted">UTR / RRN: <b class="text-success">' + utr + '</b></div></div></div></div>';
+}
+
+function showFinal(pan, ref, utr) {
+  curPan = pan;
+  $('maskedResultContainer').style.display = 'none';
+  const c = $('unlockedFinalContainer');
+  c.innerHTML = cardHtml(pan, ref, utr).replace('</div></div></div>',
+    '<div class="d-grid gap-2 noprint">'
+    + '<button type="button" id="dlPan" class="btn btn-success fw-bold rounded-pill py-2"><i class="bi bi-download me-1"></i> Download PAN Card</button>'
+    + '<div class="d-flex gap-2">'
+    + '<button type="button" id="copyPan" class="btn btn-outline-primary btn-sm rounded-pill flex-fill"><i class="bi bi-clipboard me-1"></i> Copy</button>'
+    + '<button type="button" id="printPan" class="btn btn-outline-secondary btn-sm rounded-pill flex-fill"><i class="bi bi-printer me-1"></i> Print</button>'
+    + '</div>'
+    + '<a href="' + TG + '" target="_blank" rel="noopener" class="btn-tg"><i class="bi bi-telegram fs-5"></i> Join Telegram @frankeypanel</a>'
+    + '<button type="button" id="resetPan" class="btn btn-link btn-sm text-muted"><i class="bi bi-arrow-repeat me-1"></i> Search Another Aadhaar</button>'
+    + '</div></div>');
+  c.style.display = 'block';
+  c.scrollIntoView({ behavior:'smooth' });
+
+  $('dlPan').onclick = () => downloadTxt(pan, ref, utr);
+  $('copyPan').onclick = () => copyText(curPan).then(() => {
+    const b = $('copyPan'), o = b.innerHTML;
+    b.innerHTML = '<i class="bi bi-check2-circle text-success me-1"></i> Copied';
+    setTimeout(() => b.innerHTML = o, 1800);
+  }).catch(() => alert('Copy nahi hua: ' + curPan));
+  $('printPan').onclick = () => window.print();
+  $('resetPan').onclick = () => {
+    $('aadhaarInput').value = ''; c.style.display = 'none';
+    $('maskedResultContainer').style.display = 'none'; hideAlert($('searchAlert'));
+    curAadhaar = curMasked = curPan = '';
+    resetUnlock(); $('aadhaarInput').focus(); window.scrollTo({ top:0, behavior:'smooth' });
+  };
+  try { if (typeof confetti === 'function') confetti({ particleCount: 90, spread: 75, origin: { y: .6 } }); } catch(e) {}
+}
+</script>
+</body>
+</html>
